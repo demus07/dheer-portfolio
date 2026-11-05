@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Instrument_Sans, Newsreader } from "next/font/google";
 import type { ReactNode } from "react";
-import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { site } from "@/content/site";
 import "./globals.css";
@@ -28,7 +27,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <Header />
         <main>{children}</main>
-        <Footer />
       </body>
     </html>
   );

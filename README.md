@@ -9,11 +9,12 @@ npm run dev
 
 ## The idea
 
-One lamp in one dark room. The opening drum is a lampshade made of his work. Scrolling opens its slats into a ring, and the lamp turns each project to the viewer. It joins the Kai Marlow hero to the Minifolio ring, and it comes from his own answers: a lamp as his signature, and film as his obsession.
+One lamp in one dark room, shot as one continuous take. The opening drum is a lampshade made of his work. Scrolling opens its slats into a ring, and a keyhole opens around the lamp onto the Shararat film. The film ends on the same drum hanging in the bar, its light burns out to white, and the rest of the page is the room with the lights on. The last screen is the first, so the page loops.
 
 ## Replacing placeholders
 
 - **Images:** the files in `public/plates` are stand-ins drawn by `scripts/plates.mjs`. Put real renders in `public/` and list them under `plates` for each project in `site.ts`. The ring and project pages both read from there.
+- **The film and the joint:** `src/scenes/film.ts` and `src/scenes/joint.ts` are study-model stand-ins, not his designs. Replace them with his Shararat fly-through and joinery model.
 - **Contact:** set `email` and `socials` in `site.ts`.
 - **Portrait:** set `portrait` in `site.ts` and it appears in the about section.
 - **Going live:** set `draft: false` so search engines can index the site.

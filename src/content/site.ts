@@ -42,24 +42,23 @@ export const about = {
     "Sameer Kulavoor for his forms. Sanjay Puri for sketching first. Sajid Wajid Shaikh for moving between mediums.",
 };
 
+// Timed against the film's scroll, from 0 to 1.
+export const film = [
+  { text: "A two-storey building, now a Fabindia store.", from: 0.07, to: 0.105 },
+  { text: "Inside it, a speakeasy.", from: 0.41, to: 0.51 },
+  { text: "You come in for the music.", from: 0.57, to: 0.68 },
+  { text: "You stay for a Stranger & Sons cocktail blend.", from: 0.72, to: 0.83 },
+];
+
+export const joint = [
+  "Prototype after prototype, it didn’t look right.",
+  "Five days before the deadline we started again.",
+  "The first design only needed a few tweaks.",
+  "Its joinery needed a Japanese perspective.",
+  "We intertwined bamboo and wood.",
+];
+
 export const projects: Project[] = [
-  {
-    slug: "shararat",
-    title: "Shararat",
-    line: "A speakeasy bar and gallery for India’s musical history.",
-    facts: [
-      { label: "Brands", value: "Jim Sarbh, Stranger & Sons, Coke Studio Bharat" },
-      { label: "Site", value: "A two-storey building, now a Fabindia store" },
-      { label: "With", value: "Chaarvi Chopra" },
-    ],
-    story: [
-      "The brief was three brands in one space, each one making the others clearer.",
-      "We took a two-storey building that houses a Fabindia store and imagined a speakeasy inside it.",
-      "You come in for the music. You stay for a Stranger & Sons cocktail blend.",
-      "This is my favourite project.",
-    ],
-    plates: plates("shararat"),
-  },
   {
     slug: "maatik",
     title: "Maatik",
@@ -91,5 +90,22 @@ export const projects: Project[] = [
       "We intertwined bamboo and wood. It turned out very nice.",
     ],
     plates: plates("seat"),
+  },
+  {
+    slug: "shararat",
+    title: "Shararat",
+    line: "A speakeasy bar and gallery for India’s musical history.",
+    facts: [
+      { label: "Brands", value: "Jim Sarbh, Stranger & Sons, Coke Studio Bharat" },
+      { label: "Site", value: "A two-storey building, now a Fabindia store" },
+      { label: "With", value: "Chaarvi Chopra" },
+    ],
+    story: [
+      "The brief was three brands in one space, each one making the others clearer.",
+      "We took a two-storey building that houses a Fabindia store and imagined a speakeasy inside it.",
+      "You come in for the music. You stay for a Stranger & Sons cocktail blend.",
+      "This is my favourite project.",
+    ],
+    plates: plates("shararat"),
   },
 ];

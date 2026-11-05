@@ -144,6 +144,8 @@ img {
   grid-template-columns: repeat(4, 1fr);
   align-items: center;
   font-size: 14px;
+  color: #fff;
+  mix-blend-mode: difference;
   pointer-events: none;
 }
 
@@ -158,7 +160,7 @@ img {
 }
 
 .header__fact {
-  color: var(--dusty);
+  opacity: 0.6;
 }
 
 .header__nav {
@@ -169,18 +171,40 @@ img {
 
 .header__nav a {
   padding-block: 8px;
-  transition: color 0.3s;
+  transition: opacity 0.3s;
 }
 
 .header__nav a:hover {
-  color: var(--lava);
+  opacity: 0.6;
 }
 
-/* The lamp scene */
+/* The lamp scene. It stays fixed behind the page, which scrolls over it. */
 
-.stage-wrap {
+.page {
   position: relative;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.page .lit,
+.page .footer {
+  pointer-events: auto;
+}
+
+.hold {
+  position: relative;
+}
+
+.hold--stage {
   height: 520svh;
+}
+
+.hold--film {
+  height: 760svh;
+}
+
+.hold--loop {
+  height: 100svh;
 }
 
 .anchor {
@@ -190,10 +214,11 @@ img {
 
 .stage {
   --open: 0;
-  position: sticky;
-  top: 0;
-  height: 100svh;
+  position: fixed;
+  inset: 0;
+  z-index: 1;
   overflow: hidden;
+  background: var(--void);
 }
 
 .stage__name {
@@ -205,13 +230,6 @@ img {
   line-height: 0.82;
   letter-spacing: -0.045em;
   transform: translateY(calc(var(--open) * -130%));
-  animation: lights-on 1.8s 0.2s both;
-}
-
-@keyframes lights-on {
-  from {
-    opacity: 0;
-  }
 }
 
 .spill {
@@ -233,7 +251,6 @@ img {
   top: calc(66% - var(--open) * 12%);
   perspective: calc(220 * var(--u));
   transform-style: preserve-3d;
-  animation: lights-on 2.4s both;
 }
 
 .tilt {
@@ -368,10 +385,67 @@ img {
   text-wrap: pretty;
 }
 
+/* The film, seen first through a keyhole */
+
+.film {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  height: 100%;
+  visibility: hidden;
+  background: #24222b;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+}
+
+.captions {
+  position: fixed;
+  inset: calc(var(--header) + 3vh) auto auto var(--gutter);
+  z-index: 3;
+  width: min(9em, 84vw);
+  font-size: clamp(32px, 3.6vw, 56px);
+  pointer-events: none;
+}
+
+.captions p,
+.joint__text p {
+  position: absolute;
+  inset: 0 0 auto;
+  font-family: var(--serif);
+  letter-spacing: -0.03em;
+  line-height: 1.04;
+  text-wrap: balance;
+  opacity: 0;
+  transition: opacity 0.7s;
+}
+
+.captions p[data-on="true"],
+.joint__text p[data-on="true"] {
+  opacity: 1;
+}
+
+.flash {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* The lights on: everything after the film */
+
+.lit {
+  --dusty: #5c5c5c;
+  background: var(--snow);
+  color: var(--void);
+}
+
 /* About */
 
 .about {
-  padding: clamp(96px, 14vw, 200px) var(--gutter) 0;
+  padding: clamp(72px, 10vw, 144px) var(--gutter) 0;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: clamp(48px, 7vw, 104px) var(--gutter);
@@ -394,11 +468,10 @@ img {
   gap: 16px;
   max-width: 40ch;
   font-size: 17px;
-  color: var(--snow);
 }
 
 .stance {
-  padding: clamp(96px, 14vw, 200px) var(--gutter) 0;
+  padding: clamp(96px, 14vw, 200px) var(--gutter) clamp(72px, 10vw, 144px);
   display: grid;
   gap: 20px;
 }
@@ -408,8 +481,36 @@ img {
   max-width: 13em;
 }
 
+/* The bamboo joint */
+
+.hold--joint {
+  height: 460svh;
+}
+
+.joint {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+
+.joint__canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.joint__text {
+  position: absolute;
+  inset: calc(var(--header) + 3vh) auto auto var(--gutter);
+  width: min(15em, 84vw);
+  font-size: clamp(30px, 3.6vw, 56px);
+}
+
 .notes {
-  padding: clamp(96px, 12vw, 176px) var(--gutter) 0;
+  padding: clamp(72px, 9vw, 120px) var(--gutter) clamp(96px, 12vw, 176px);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 24px var(--gutter);
@@ -427,6 +528,8 @@ img {
 /* Footer */
 
 .footer {
+  position: relative;
+  background: var(--void);
   padding: clamp(120px, 16vw, 240px) var(--gutter) clamp(40px, 5vw, 72px);
   text-align: center;
 }
