@@ -1,34 +1,23 @@
-# Dheer: portfolio (first draft)
+# Dheer: portfolio
 
-Every word on the site lives in `src/content/site.ts`. Anything in `[square brackets]` is a placeholder and renders with a dashed underline, so gaps are easy to spot.
+Every word on the site lives in `src/content/site.ts`, written from Dheer's questionnaire answers.
 
 ```bash
 npm install
 npm run dev
 ```
 
-## Replacing placeholders
-
-- **Copy:** edit `src/content/site.ts`.
-- **Images:** add files to `public/` and pass `src` to the matching `<Plate>`. Line drawings stand in until then, and each caption says what belongs there.
-- **Going live:** set `draft: false` in `site.ts` so search engines can index the site.
-
 ## The idea
 
-The site is a floor plan. The cursor is a lamp, each room is a project, and each project is presented as a title with a poster and credits.
+One lamp in one dark room. The opening drum is a lampshade made of his work. Scrolling opens its slats into a ring, and the lamp turns each project to the viewer. It joins the Kai Marlow hero to the Minifolio ring, and it comes from his own answers: a lamp as his signature, and film as his obsession.
 
-## What came from where
+## Replacing placeholders
 
-| Reference | Taken |
-| --- | --- |
-| A24 | Projects as titles: posters, credits, Now Showing / In Development |
-| Bombay Design Lab | An index of named work, filterable by type |
-| L.A.B. | The three-word philosophy, and notes headlined as questions |
-| Kai Marlow | A warm, first-person about page with life outside work |
-| Mōno | Bracketed, numbered labels and big type |
-| Minifolio | Restraint: only Index, About, Contact |
-| MuseLAB | Nothing yet. The site is a holding page right now |
+- **Images:** the files in `public/plates` are stand-ins drawn by `scripts/plates.mjs`. Put real renders in `public/` and list them under `plates` for each project in `site.ts`. The ring and project pages both read from there.
+- **Contact:** set `email` and `socials` in `site.ts`.
+- **Portrait:** set `portrait` in `site.ts` and it appears in the about section.
+- **Going live:** set `draft: false` so search engines can index the site.
 
 ## Palette
 
-Dark Void `#151419`, Gluon Grey `#1B1B1E`, Slate Grey `#262626`, Dusty Grey `#878787`, Snow `#FBFBFB`, Liquid Lava `#F56E0F`.
+Dark Void `#151419`, Dusty Grey `#878787`, Snow `#FBFBFB`, Liquid Lava `#F56E0F`, with Slate Grey `#262626` in the plates. Orange comes from the lamp, so it stays rare.
