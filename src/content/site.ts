@@ -1,111 +1,195 @@
-// All site copy lives here, written from Dheer's questionnaire answers.
+// All site copy lives here, taken from Dheer's questionnaire, portfolio, CV and the Shararat brand book.
+// Images come from src/content/media.json, which scripts/prepare-assets.py writes.
+
+import media from "./media.json";
+
+export type Media = { src: string; width: number; height: number; alt: string; kind: string };
+export type Block = { full: string } | { pair: [string, string] };
 
 export type Project = {
   slug: string;
   title: string;
   line: string;
+  tags: [string, string];
+  cover: string;
   facts: { label: string; value: string }[];
+  epigraph?: string;
   story: string[];
-  plates: string[];
+  hero?: string;
+  gallery: Block[];
+  drawings: string[];
+  studies?: { title: string; images: string[] };
 };
 
-const plates = (name: string) =>
-  [1, 2, 3, 4, 5, 6].map((n) => `/plates/${name}-${n}.svg`);
+export const work = media.work as Record<string, Record<string, Media>>;
+export const ringCards = media.ring as Record<string, string[]>;
+export const sketches = media.sketches as Record<string, { src: string; width: number; height: number }>;
+export const filmFrames = media.film as { count: number; fps: number; width: number; height: number; cuts: number[] };
 
 export const site = {
   // Keeps the site out of search engines. Set to false at launch.
   draft: true,
   name: "Dheer",
+  fullName: "Dheer Chheda",
   role: "Interior design student",
   location: "Mumbai",
   intro: "Intriguing, accessible, thoughtful. I start with the feeling and the people.",
-  email: "[your@email.com]",
+  email: "dheerchheda1@gmail.com",
   // Add a path in public/ to show a portrait in the about section.
   portrait: "",
   socials: [] as { label: string; url: string }[],
 };
 
-export const about = {
-  headline: "I walk in and watch the light.",
-  line: "How it reacts with the colour. Why the space was built. How it makes me feel.",
-  story: [
-    "I grew up in Prabhadevi, sketching. My parents backed every choice I made.",
-    "Interior design started as a minor in first year. One project went well, and I stayed.",
-    "I work with graphical elements because they show who I am. The details do the rest.",
-  ],
-  stance: "Minimal became the default. Personal taste paid for it.",
-  stanceLine: "I design for the visual direction a person already has.",
-  process:
-    "Research and sketching go together. The sketches tell me where to go. Then 3D, then CAD, then renders. I change any of them when another gives me a better answer.",
-  films: "I call myself a cinephile. Inglourious Basterds, Interstellar and Kung Fu Panda share a shelf.",
-  influences:
-    "Sameer Kulavoor for his forms. Sanjay Puri for sketching first. Sajid Wajid Shaikh for moving between mediums.",
+// The opening, set while the site loads. The words after the lead fall into the grid one by one.
+export const hook = {
+  lead: "Every room begins",
+  fall: ["with", "the", "light."],
+  close: "The rest is how it feels.",
 };
 
-// Timed against the film's scroll, from 0 to 1.
+export const about = {
+  lead: "I’m Dheer, an interior design student from Prabhadevi. I walk into a room and watch the light: how it meets the colour, why the space was built, and how it makes me feel.",
+  stance: "Minimal became the default. Personal taste paid for it. I design for the visual direction a person already has.",
+};
+
+// A short piece in his words.
+export const notes = [
+  "I grew up in Prabhadevi, sketching. My parents backed every choice I made.",
+  "Interior design started as a minor in my first year. One project went well, and I stayed.",
+  "Sameer Kulavoor for his forms. Sanjay Puri for sketching first. Sajid Wajid Shaikh for moving between mediums.",
+  "Away from the drawing board I’m a cinephile. Inglourious Basterds, Interstellar and Kung Fu Panda share a shelf.",
+];
+
+// How a project moves, shown on Maatik. Each step names an image in media.json.
+export const process = [
+  { name: "Sketch", line: "After a first round of research I sketch every idea I have. The sketches tell me where to go.", image: "sketch" },
+  { name: "Study", line: "Then I refine it and think in 3D. For Maatik, the roof came before the model.", image: "study-truss" },
+  { name: "Plan", line: "Then the CAD and the technical part. Where the wheel sits, where the café opens.", image: "plan" },
+  { name: "Section", line: "The cut through the banyan court. The brick, the stone and the high ceilings stay.", image: "section" },
+  { name: "Render", line: "Then the renders. I go back and change any of it whenever something gives me a better answer.", image: "facade" },
+];
+
+// His CV, kept short.
+export const cv = [
+  { role: "Interior design", place: "ISDI, Atlas SkillTech University", when: "2023 to 2027" },
+  { role: "Spatial graphic designer", place: "Alvarez & Marsal", when: "2026" },
+  { role: "Exhibit designer", place: "Freeform × IFLA", when: "2025" },
+  { role: "Interior design intern", place: "Essence of Art", when: "" },
+  { role: "Interior design intern", place: "Space X", when: "" },
+  { role: "Mural", place: "Closed Bonet", when: "2023" },
+];
+
+// Timed against the walkthrough's scroll, from 0 to 1. Lines from his portfolio and the brand book.
 export const film = [
-  { text: "A two-storey building, now a Fabindia store.", from: 0.07, to: 0.105 },
-  { text: "Inside it, a speakeasy.", from: 0.41, to: 0.51 },
-  { text: "You come in for the music.", from: 0.57, to: 0.68 },
-  { text: "You stay for a Stranger & Sons cocktail blend.", from: 0.72, to: 0.83 },
+  { text: "You weren’t supposed to find this. And yet here you are.", from: 0.3, to: 0.44 },
+  { text: "A forgotten jazz club in 1996, inside a tropical hotel.", from: 0.48, to: 0.62 },
+  { text: "Somewhere to sit back, listen to vinyl and stay for hours.", from: 0.66, to: 0.78 },
+  { text: "Mischief was always going to find you. It just needed the right room.", from: 0.82, to: 0.95 },
 ];
 
-export const joint = [
-  "Prototype after prototype, it didn’t look right.",
-  "Five days before the deadline we started again.",
-  "The first design only needed a few tweaks.",
-  "Its joinery needed a Japanese perspective.",
-  "We intertwined bamboo and wood.",
-];
-
+// In the order they appear on the home page.
 export const projects: Project[] = [
   {
     slug: "maatik",
     title: "Maatik",
-    line: "A co-working space for the potters of Dharavi.",
-    facts: [{ label: "With", value: "Chaarvi Chopra" }],
-    story: [],
-    plates: plates("maatik"),
+    line: "A workspace for the potters of Dharavi.",
+    tags: ["Adaptive reuse", "Co-working"],
+    cover: "facade",
+    facts: [
+      { label: "Site", value: "IF BE, Ballard Estate, Fort" },
+      { label: "Area", value: "11,200 sq ft" },
+      { label: "Type", value: "Adaptive reuse, co-working" },
+      { label: "With", value: "Chaarvi Chopra" },
+    ],
+    story: [
+      "IF BE sits in Ballard Estate, close to the trade the potters of Dharavi depend on and easy to see from the street.",
+      "We kept the brickwork, the stone and the high ceilings. The building didn’t need to look new. It needed to feel like theirs.",
+      "The curves come from the wheel and the vessel. The potters’ worktable takes its shape from क, the first letter of kumbhar.",
+      "The café opens onto the workshop, so a cup of coffee comes with a view of the wheel.",
+    ],
+    hero: "facade",
+    gallery: [
+      { full: "cafe" },
+      { pair: ["workshop", "vessel"] },
+      { full: "swing" },
+      { pair: ["lounge", "office"] },
+      { full: "bar" },
+      { pair: ["kitchen", "library"] },
+    ],
+    drawings: ["plan", "section"],
+    studies: { title: "Before the model, the roof.", images: ["study-roof", "study-truss"] },
   },
   {
     slug: "light-of-bharat",
     title: "Light of Bharat",
-    line: "Regenerative interiors.",
-    facts: [{ label: "With", value: "Chaarvi Chopra" }],
-    story: [],
-    plates: plates("bharat"),
-  },
-  {
-    slug: "bamboo-seat",
-    title: "The bamboo seat",
-    line: "Seating that had to be rebuilt five days before the deadline.",
+    line: "An Irani café from 1940, made seen again.",
+    tags: ["Renovation", "Irani café"],
+    cover: "dining",
     facts: [
-      { label: "Brief", value: "Seating from sustainable materials" },
-      { label: "Joinery", value: "Intertwined bamboo and wood" },
+      { label: "Site", value: "Ranade Road, Dadar" },
+      { label: "Area", value: "800 sq ft" },
+      { label: "Type", value: "Renovation, identity" },
+      { label: "With", value: "Chaarvi Chopra" },
     ],
     story: [
-      "We chose materials that would work together through joinery. Prototype after prototype, it didn’t look right.",
-      "Five days before the deadline we started again from scratch.",
-      "Then I saw it. The first design only needed a few tweaks, and its joinery needed a Japanese perspective.",
-      "We intertwined bamboo and wood. It turned out very nice.",
+      "Light of Bharat has been part of the street since 1940. It never lacked identity. It lacked visibility.",
+      "So we didn’t change it. We made it seen.",
+      "Persian carpets move to the ceiling. The furniture stays where the regulars expect it, so they can take their old seats.",
+      "Chessboards are carved into the tables, because an Irani café was always a place to stay a while.",
     ],
-    plates: plates("seat"),
+    hero: "dining",
+    gallery: [{ pair: ["today", "counter"] }, { full: "chess" }, { full: "bar" }],
+    drawings: ["plan", "section"],
+  },
+  {
+    slug: "hubtown-seasons",
+    title: "Hubtown Seasons",
+    line: "A sales lobby in Chembur, from idea to execution.",
+    tags: ["Sales lobby", "Built"],
+    cover: "elevations",
+    facts: [
+      { label: "Client", value: "Hubtown" },
+      { label: "Site", value: "Chembur East" },
+      { label: "Area", value: "6,000 sq ft, 15 ft ceilings" },
+      { label: "At", value: "Essence of Art, as an intern" },
+    ],
+    story: [
+      "My first project from idea to execution, as an intern at Essence of Art.",
+      "The footprint is irregular. Its edges hold the meeting rooms and storage, and the centre stays open.",
+      "The fifteen-foot ceiling sets the proportions. Tall glazing, textured walls and dark verticals do the rest.",
+    ],
+    gallery: [],
+    drawings: ["elevations", "passage", "plan"],
   },
   {
     slug: "shararat",
     title: "Shararat",
-    line: "A speakeasy bar and gallery for India’s musical history.",
+    line: "A speakeasy for Indian music, inside a heritage building in Fort.",
+    tags: ["Speakeasy", "Three brands"],
+    cover: "bar",
     facts: [
-      { label: "Brands", value: "Jim Sarbh, Stranger & Sons, Coke Studio Bharat" },
-      { label: "Site", value: "A two-storey building, now a Fabindia store" },
+      { label: "Brief", value: "Coke Studio Bharat, Stranger & Sons, Jim Sarbh" },
+      { label: "Site", value: "Jeroo Building, Kala Ghoda" },
+      { label: "Area", value: "12,500 sq ft on three levels" },
       { label: "With", value: "Chaarvi Chopra" },
     ],
+    epigraph: "Mischief was always going to find you. It just needed the right room.",
     story: [
-      "The brief was three brands in one space, each one making the others clearer.",
-      "We took a two-storey building that houses a Fabindia store and imagined a speakeasy inside it.",
-      "You come in for the music. You stay for a Stranger & Sons cocktail blend.",
+      "Three brands, one room. Coke Studio Bharat brings the music, Stranger & Sons the pour, and Jim Sarbh the eye for what goes on the walls.",
+      "Behind the Fabindia shopfront in Fort, a double-height speakeasy, with a mezzanine over the bar.",
+      "It should feel like a forgotten jazz club in 1996, inside a tropical hotel. Dark timber, burgundy leather, brushed brass, palms on the walls.",
       "This is my favourite project.",
     ],
-    plates: plates("shararat"),
+    hero: "bar",
+    gallery: [
+      { full: "passage" },
+      { pair: ["lounge", "speakers"] },
+      { full: "mezzanine" },
+      { pair: ["vinyl", "booths"] },
+      { full: "cowork" },
+      { pair: ["library", "table"] },
+    ],
+    drawings: ["plans", "sections"],
+    studies: { title: "Pieces we drew for the room.", images: ["piece-sofa", "piece-chair", "piece-bar", "piece-booth"] },
   },
 ];

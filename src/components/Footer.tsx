@@ -1,13 +1,11 @@
 import { site } from "@/content/site";
 
 export function Footer() {
-  const hasEmail = !site.email.startsWith("[");
-
   return (
     <footer className="footer" id="contact">
       <h2 className="footer__title">Let’s talk</h2>
       <div className="footer__links">
-        {hasEmail ? <a href={`mailto:${site.email}`}>{site.email}</a> : <p>{site.email}</p>}
+        <a href={`mailto:${site.email}`}>{site.email}</a>
         {site.socials.length > 0 && (
           <ul>
             {site.socials.map((s) => (
@@ -17,6 +15,12 @@ export function Footer() {
             ))}
           </ul>
         )}
+      </div>
+      <div className="footer__base">
+        <span>{site.fullName}</span>
+        <span>
+          {site.role}, {site.location}
+        </span>
       </div>
     </footer>
   );

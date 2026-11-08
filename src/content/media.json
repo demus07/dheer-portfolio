@@ -1,0 +1,390 @@
+{
+ "work": {
+  "shararat": {
+   "bar": {
+    "src": "/work/shararat/bar.webp",
+    "width": 2400,
+    "height": 1349,
+    "alt": "The bar, between timber columns",
+    "kind": "render"
+   },
+   "passage": {
+    "src": "/work/shararat/passage.webp",
+    "width": 2400,
+    "height": 1350,
+    "alt": "The entrance passage",
+    "kind": "render"
+   },
+   "lounge": {
+    "src": "/work/shararat/lounge.webp",
+    "width": 1887,
+    "height": 967,
+    "alt": "Lounge with the palm wallpaper",
+    "kind": "render"
+   },
+   "speakers": {
+    "src": "/work/shararat/speakers.webp",
+    "width": 2400,
+    "height": 1350,
+    "alt": "The illuminated speaker wall",
+    "kind": "render"
+   },
+   "mezzanine": {
+    "src": "/work/shararat/mezzanine.webp",
+    "width": 2400,
+    "height": 1350,
+    "alt": "The double-height lounge and mezzanine",
+    "kind": "render"
+   },
+   "vinyl": {
+    "src": "/work/shararat/vinyl.webp",
+    "width": 2400,
+    "height": 1350,
+    "alt": "A corner for listening",
+    "kind": "render"
+   },
+   "cowork": {
+    "src": "/work/shararat/cowork.webp",
+    "width": 2400,
+    "height": 1350,
+    "alt": "The first-floor coworking bar",
+    "kind": "render"
+   },
+   "library": {
+    "src": "/work/shararat/library.webp",
+    "width": 2400,
+    "height": 1350,
+    "alt": "First-floor lounge",
+    "kind": "render"
+   },
+   "booths": {
+    "src": "/work/shararat/booths.webp",
+    "width": 2400,
+    "height": 1351,
+    "alt": "Booths along the speakeasy",
+    "kind": "render"
+   },
+   "table": {
+    "src": "/work/shararat/table.webp",
+    "width": 2400,
+    "height": 1350,
+    "alt": "Communal table on the first floor",
+    "kind": "render"
+   },
+   "piece-sofa": {
+    "src": "/work/shararat/piece-sofa.webp",
+    "width": 1184,
+    "height": 686,
+    "alt": "Curved sofa and lounge set",
+    "kind": "piece"
+   },
+   "piece-chair": {
+    "src": "/work/shararat/piece-chair.webp",
+    "width": 930,
+    "height": 730,
+    "alt": "Lounge chair",
+    "kind": "piece"
+   },
+   "piece-bar": {
+    "src": "/work/shararat/piece-bar.webp",
+    "width": 1154,
+    "height": 707,
+    "alt": "Bar counter",
+    "kind": "piece"
+   },
+   "piece-booth": {
+    "src": "/work/shararat/piece-booth.webp",
+    "width": 1093,
+    "height": 723,
+    "alt": "Booth seating",
+    "kind": "piece"
+   },
+   "plans": {
+    "src": "/work/shararat/plans.webp",
+    "width": 2400,
+    "height": 1351,
+    "alt": "Ground floor and mezzanine plans",
+    "kind": "drawing"
+   },
+   "sections": {
+    "src": "/work/shararat/sections.webp",
+    "width": 2400,
+    "height": 1350,
+    "alt": "Sections",
+    "kind": "drawing"
+   }
+  },
+  "maatik": {
+   "facade": {
+    "src": "/work/maatik/facade.webp",
+    "width": 2400,
+    "height": 1106,
+    "alt": "The IF BE warehouse, Ballard Estate",
+    "kind": "render"
+   },
+   "cafe": {
+    "src": "/work/maatik/cafe.webp",
+    "width": 2400,
+    "height": 1487,
+    "alt": "The caf\u00e9 under the arch",
+    "kind": "render"
+   },
+   "lounge": {
+    "src": "/work/maatik/lounge.webp",
+    "width": 2400,
+    "height": 1459,
+    "alt": "Lounge beside the brick wall",
+    "kind": "render"
+   },
+   "workshop": {
+    "src": "/work/maatik/workshop.webp",
+    "width": 2400,
+    "height": 1429,
+    "alt": "The potters' workshop",
+    "kind": "render"
+   },
+   "vessel": {
+    "src": "/work/maatik/vessel.webp",
+    "width": 2400,
+    "height": 1449,
+    "alt": "A vessel in the arched window",
+    "kind": "render"
+   },
+   "office": {
+    "src": "/work/maatik/office.webp",
+    "width": 2400,
+    "height": 1491,
+    "alt": "Office lobby",
+    "kind": "render"
+   },
+   "kitchen": {
+    "src": "/work/maatik/kitchen.webp",
+    "width": 2400,
+    "height": 1863,
+    "alt": "Pantry and dining",
+    "kind": "render"
+   },
+   "bar": {
+    "src": "/work/maatik/bar.webp",
+    "width": 2400,
+    "height": 1859,
+    "alt": "Caf\u00e9 counter",
+    "kind": "render"
+   },
+   "swing": {
+    "src": "/work/maatik/swing.webp",
+    "width": 2400,
+    "height": 1906,
+    "alt": "Swings below the stone wall",
+    "kind": "render"
+   },
+   "library": {
+    "src": "/work/maatik/library.webp",
+    "width": 2400,
+    "height": 1596,
+    "alt": "Reading corner",
+    "kind": "render"
+   },
+   "plan": {
+    "src": "/work/maatik/plan.webp",
+    "width": 2400,
+    "height": 1435,
+    "alt": "Furniture layout",
+    "kind": "drawing"
+   },
+   "section": {
+    "src": "/work/maatik/section.webp",
+    "width": 2400,
+    "height": 826,
+    "alt": "Section through the banyan court",
+    "kind": "drawing"
+   },
+   "study-roof": {
+    "src": "/work/maatik/study-roof.webp",
+    "width": 1066,
+    "height": 1600,
+    "alt": "Pencil study of the workshop roof",
+    "kind": "pencil"
+   },
+   "study-truss": {
+    "src": "/work/maatik/study-truss.webp",
+    "width": 1092,
+    "height": 1600,
+    "alt": "Pencil study of the trusses",
+    "kind": "pencil"
+   }
+  },
+  "light-of-bharat": {
+   "dining": {
+    "src": "/work/light-of-bharat/dining.webp",
+    "width": 1120,
+    "height": 631,
+    "alt": "Persian carpet ceilings over the dining room",
+    "kind": "render"
+   },
+   "counter": {
+    "src": "/work/light-of-bharat/counter.webp",
+    "width": 1130,
+    "height": 629,
+    "alt": "The counter and the old signage",
+    "kind": "render"
+   },
+   "bar": {
+    "src": "/work/light-of-bharat/bar.webp",
+    "width": 1133,
+    "height": 625,
+    "alt": "Upholstered stools at the counter",
+    "kind": "render"
+   },
+   "chess": {
+    "src": "/work/light-of-bharat/chess.webp",
+    "width": 1132,
+    "height": 622,
+    "alt": "Carved chessboard tables",
+    "kind": "render"
+   },
+   "today": {
+    "src": "/work/light-of-bharat/today.webp",
+    "width": 890,
+    "height": 1516,
+    "alt": "Light of Bharat as it is today",
+    "kind": "photo"
+   },
+   "plan": {
+    "src": "/work/light-of-bharat/plan.webp",
+    "width": 2400,
+    "height": 1804,
+    "alt": "Furniture layout",
+    "kind": "drawing"
+   },
+   "section": {
+    "src": "/work/light-of-bharat/section.webp",
+    "width": 2400,
+    "height": 1806,
+    "alt": "Section A\u2013A1",
+    "kind": "drawing"
+   }
+  },
+  "hubtown-seasons": {
+   "plan": {
+    "src": "/work/hubtown-seasons/plan.webp",
+    "width": 2400,
+    "height": 3238,
+    "alt": "Sales office floor plan",
+    "kind": "drawing"
+   },
+   "elevations": {
+    "src": "/work/hubtown-seasons/elevations.webp",
+    "width": 2400,
+    "height": 2288,
+    "alt": "Passage 9 elevations",
+    "kind": "drawing"
+   },
+   "passage": {
+    "src": "/work/hubtown-seasons/passage.webp",
+    "width": 2312,
+    "height": 3071,
+    "alt": "Passage 8 elevations",
+    "kind": "drawing"
+   }
+  },
+  "sketchbook": {
+   "page-1": {
+    "src": "/work/sketchbook/page-1.webp",
+    "width": 960,
+    "height": 1280,
+    "alt": "A page from his sketchbook",
+    "kind": "pencil"
+   },
+   "page-2": {
+    "src": "/work/sketchbook/page-2.webp",
+    "width": 1200,
+    "height": 1600,
+    "alt": "A page from his sketchbook",
+    "kind": "pencil"
+   }
+  }
+ },
+ "ring": {
+  "shararat": [
+   "/ring/shararat-1.webp",
+   "/ring/shararat-2.webp",
+   "/ring/shararat-3.webp",
+   "/ring/shararat-4.webp",
+   "/ring/shararat-5.webp",
+   "/ring/shararat-6.webp",
+   "/ring/shararat-7.webp",
+   "/ring/shararat-8.webp"
+  ],
+  "maatik": [
+   "/ring/maatik-1.webp",
+   "/ring/maatik-2.webp",
+   "/ring/maatik-3.webp",
+   "/ring/maatik-4.webp",
+   "/ring/maatik-5.webp",
+   "/ring/maatik-6.webp",
+   "/ring/maatik-7.webp",
+   "/ring/maatik-8.webp"
+  ],
+  "light-of-bharat": [
+   "/ring/light-of-bharat-1.webp",
+   "/ring/light-of-bharat-2.webp",
+   "/ring/light-of-bharat-3.webp",
+   "/ring/light-of-bharat-4.webp",
+   "/ring/light-of-bharat-5.webp",
+   "/ring/light-of-bharat-6.webp",
+   "/ring/light-of-bharat-7.webp",
+   "/ring/light-of-bharat-8.webp"
+  ],
+  "hubtown-seasons": [
+   "/ring/hubtown-seasons-1.webp",
+   "/ring/hubtown-seasons-2.webp",
+   "/ring/hubtown-seasons-3.webp",
+   "/ring/hubtown-seasons-4.webp",
+   "/ring/hubtown-seasons-5.webp",
+   "/ring/hubtown-seasons-6.webp",
+   "/ring/hubtown-seasons-7.webp",
+   "/ring/hubtown-seasons-8.webp"
+  ]
+ },
+ "sketches": {
+  "maatik": {
+   "src": "/sketches/maatik.svg",
+   "width": 3973,
+   "height": 2247
+  },
+  "light-of-bharat": {
+   "src": "/sketches/light-of-bharat.svg",
+   "width": 2236,
+   "height": 2409
+  },
+  "shararat": {
+   "src": "/sketches/shararat.svg",
+   "width": 4097,
+   "height": 2728
+  },
+  "hubtown-seasons": {
+   "src": "/sketches/hubtown-seasons.svg",
+   "width": 2245,
+   "height": 1832
+  }
+ },
+ "film": {
+  "count": 187,
+  "fps": 12,
+  "start": 2.2,
+  "width": 1280,
+  "height": 720,
+  "cuts": [
+   35,
+   66,
+   106,
+   146
+  ]
+ },
+ "figure": {
+  "src": "/sketches/figure.svg",
+  "width": 95.5,
+  "height": 343.0
+ }
+}

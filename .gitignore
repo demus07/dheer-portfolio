@@ -6,3 +6,9 @@ out
 .DS_Store
 *.tsbuildinfo
 next-env.d.ts
+
+# Source material, kept out of the repo
+context/
+mock/
+AGENTS.md
+__pycache__/

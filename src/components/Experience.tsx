@@ -1,126 +1,134 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { about, film, joint, projects, site } from "@/content/site";
+import { about, cv, film, filmFrames, notes, process, projects, ringCards, site, sketches, work } from "@/content/site";
 import { Footer } from "./Footer";
+import { Loader } from "./Loader";
 
-const cards = projects.flatMap((p, i) =>
-  [...p.plates, p.plates[0], p.plates[2]].map((src) => ({ src, project: i, slug: p.slug })),
+const cards = projects.flatMap((p, i) => ringCards[p.slug].map((src) => ({ src, project: i, slug: p.slug })));
+const N = cards.length;
+const steps = process.map((s) =>
+  s.image === "sketch"
+    ? { ...s, src: sketches.maatik.src, alt: "Maatik, first sketch", paper: true }
+    : { ...s, src: work.maatik[s.image].src, alt: work.maatik[s.image].alt, paper: s.image !== "facade" },
 );
-
-// Share of the pinned scroll spent opening the shade. The rest tours the projects.
-const OPEN_END = 0.28;
-const SECTOR = 360 / projects.length;
-
-// Keyhole at 100 × 160, with the circle's centre at (50, 40).
-const KEYHOLE =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 160'%3E%3Ccircle cx='50' cy='40' r='40'/%3E%3Cpath d='M30 66 12 160h76L70 66z'/%3E%3C/svg%3E\")";
 
 const clamp = (n: number) => Math.min(1, Math.max(0, n));
 const ease = (n: number) => n * n * (3 - 2 * n);
 const span = (n: number, from: number, to: number) => clamp((n - from) / (to - from));
+const mix = (a: number, b: number, t: number) => a + (b - a) * t;
+const frameSrc = (i: number) => `/film/${String(i).padStart(3, "0")}.webp`;
 
-type Scene = { draw(t: number): void; resize(w: number, h: number): void; dispose(): void };
-
-// One continuous shot. The drum opens into the ring, the keyhole opens onto the film,
-// the film burns out to white, and the last screen is the first, so the page wraps.
+// The home page. His name over a drum of his renders, which opens into a ring as you scroll.
+// Then his Shararat walkthrough grows out of the dark, the projects, how he works, and him.
 export function Experience() {
   const stage = useRef<HTMLElement>(null);
-  const ring = useRef<HTMLDivElement>(null);
-  const lamp = useRef<HTMLDivElement>(null);
-  const filmCanvas = useRef<HTMLCanvasElement>(null);
-  const flash = useRef<HTMLDivElement>(null);
-  const holdStage = useRef<HTMLDivElement>(null);
-  const holdFilm = useRef<HTMLDivElement>(null);
-  const holdJoint = useRef<HTMLDivElement>(null);
-  const jointCanvas = useRef<HTMLCanvasElement>(null);
+  const tilt = useRef<HTMLDivElement>(null);
+  const spin = useRef<HTMLDivElement>(null);
+  const reel = useRef<HTMLElement>(null);
+  const frameBox = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const stepsRef = useRef<HTMLElement>(null);
 
-  const [active, setActive] = useState(0);
-  const [touring, setTouring] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [ready, setReady] = useState(false);
+  const [front, setFront] = useState(0);
   const [caption, setCaption] = useState(-1);
-  const [jointLine, setJointLine] = useState(0);
+  const [step, setStep] = useState(0);
 
   useEffect(() => {
-    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    // Held here because React clears refs just before this effect is cleaned up.
-    const canvas = filmCanvas.current!;
     const stageEl = stage.current!;
-    const ringEl = ring.current!;
-    const lampEl = lamp.current!;
-    const flashEl = flash.current!;
-    const holdStageEl = holdStage.current!;
-    const holdFilmEl = holdFilm.current!;
-    const holdJointEl = holdJoint.current!;
-    const jointEl = jointCanvas.current!;
-    const follow = (rate: number) => (still ? 1 : rate);
-    let filmScene: Scene | null = null;
-    let jointScene: Scene | null = null;
-    let gone = false;
-    let frame = 0;
-    let last = performance.now();
-    let open = 0;
-    let rot = 0;
-    let filmT = 0;
-    let jointT = 0;
-    let S = 0;
-    let F = 0;
-    let max = 0;
-    let vh = 0;
-    let jointTop = 0;
-    let jointHeight = 0;
+    const tiltEl = tilt.current!;
+    const spinEl = spin.current!;
+    const reelEl = reel.current!;
+    const boxEl = frameBox.current!;
+    const canvas = canvasRef.current!;
+    const context = canvas.getContext("2d");
+    const stepsEl = stepsRef.current!;
 
-    const measure = () => {
-      vh = window.innerHeight;
-      S = holdStageEl.offsetHeight;
-      F = holdFilmEl.offsetHeight;
-      max = document.documentElement.scrollHeight - vh;
-      const box = holdJointEl.getBoundingClientRect();
-      jointTop = box.top + window.scrollY;
-      jointHeight = box.height;
-      filmScene?.resize(window.innerWidth, vh);
-      jointScene?.resize(window.innerWidth, vh);
-    };
-
-    canvas.style.setProperty("mask-image", KEYHOLE);
-    canvas.style.setProperty("-webkit-mask-image", KEYHOLE);
-
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const previous = history.scrollRestoration;
     history.scrollRestoration = "manual";
+    if (!location.hash) window.scrollTo(0, 0);
 
-    // Three.js stays out of the first load, so the landing paints straight away.
-    Promise.all([import("@/scenes/film"), import("@/scenes/joint")])
-      .then(([{ createFilm }, { createJoint }]) => {
-        if (gone) return;
-        filmScene = createFilm(canvas);
-        jointScene = createJoint(jointEl);
-        measure();
-      })
-      .catch(() => {
-        // No WebGL: the captions and the rest of the page still carry the story.
-      });
+    let vw = 0;
+    let vh = 0;
+    let W = 0;
+    let stageTop = 0;
+    let stageH = 0;
+    let reelTop = 0;
+    let reelH = 0;
+    let stepsTop = 0;
+    let stepsH = 0;
+    let rot = 0;
+    let last = performance.now();
+    let frame = 0;
+    let filmT = 0;
+    let drawn = -1;
+    let shownFront = -1;
+    let shownCaption = -2;
+    let shownStep = -1;
 
-    const openKeyhole = (opening: number) => {
-      const size = (value: string) => {
-        canvas.style.setProperty("mask-size", value);
-        canvas.style.setProperty("-webkit-mask-size", value);
-      };
-      const place = (value: string) => {
-        canvas.style.setProperty("mask-position", value);
-        canvas.style.setProperty("-webkit-mask-position", value);
-      };
-      if (opening >= 1) {
-        size("100% 100%");
-        canvas.style.setProperty("mask-image", "none");
-        canvas.style.setProperty("-webkit-mask-image", "none");
-        return;
+    // The walkthrough loads in order, a few frames at a time, once it is close.
+    const frames: HTMLImageElement[] = [];
+    let next = 0;
+    const loadOne = () => {
+      if (next >= filmFrames.count) return;
+      const img = new window.Image();
+      frames[next] = img;
+      img.src = frameSrc(next++);
+      img.decode().catch(() => {}).finally(loadOne);
+    };
+    const loadFilm = () => {
+      if (next > 0) return;
+      for (let i = 0; i < 6; i++) loadOne();
+    };
+    const ready = (i: number) => frames[i]?.complete && frames[i].naturalWidth > 0;
+
+    const cover = (img: HTMLImageElement) => {
+      const scale = Math.max(canvas.width / img.naturalWidth, canvas.height / img.naturalHeight);
+      const w = img.naturalWidth * scale;
+      const h = img.naturalHeight * scale;
+      context!.drawImage(img, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+    };
+
+    // Each frame dissolves into the next, so 12 frames a second reads as continuous.
+    // His cuts stay cuts.
+    const drawFilm = (position: number) => {
+      if (!context || Math.abs(position - drawn) < 0.003) return;
+      const a = Math.floor(position);
+      const t = position - a;
+      let base = -1;
+      for (let d = 0; d <= a && base < 0; d++) if (ready(a - d)) base = a - d;
+      if (base < 0) return;
+      drawn = position;
+      context.globalAlpha = 1;
+      cover(frames[base]);
+      if (base === a && t > 0.01 && ready(a + 1) && !filmFrames.cuts.includes(a + 1)) {
+        context.globalAlpha = t;
+        cover(frames[a + 1]);
+        context.globalAlpha = 1;
       }
-      canvas.style.setProperty("mask-image", KEYHOLE);
-      canvas.style.setProperty("-webkit-mask-image", KEYHOLE);
-      const box = lampEl.getBoundingClientRect();
-      const width = 2 + opening * opening * Math.max(window.innerWidth, vh) * 6;
-      size(`${width}px ${width * 1.6}px`);
-      place(`${box.left + box.width / 2 - width * 0.5}px ${box.top + box.height / 2 - width * 0.4}px`);
+    };
+
+    const top = (el: HTMLElement) => el.getBoundingClientRect().top + window.scrollY;
+    const measure = () => {
+      vw = window.innerWidth;
+      vh = window.innerHeight;
+      W = vw < 760 ? vw * 1.7 : Math.min(vw, vh * 1.75);
+      stageEl.style.setProperty("--cw", `${(W * 0.085).toFixed(1)}px`);
+      stageEl.style.setProperty("--ch", `${(W * 0.16).toFixed(1)}px`);
+      stageTop = top(stageEl);
+      stageH = stageEl.offsetHeight;
+      reelTop = top(reelEl);
+      reelH = reelEl.offsetHeight;
+      stepsTop = top(stepsEl);
+      stepsH = stepsEl.offsetHeight;
+      canvas.width = Math.min(vw, 1600);
+      canvas.height = Math.round((canvas.width * vh) / vw);
+      drawn = -1;
     };
 
     const tick = (now: number) => {
@@ -128,54 +136,61 @@ export function Experience() {
       last = now;
       const y = window.scrollY;
 
-      if (!still && max > 0 && y >= max - 1) {
-        window.scrollTo({ top: 0, behavior: "instant" });
+      // The drum turns on its own, and the scroll turns it further.
+      if (y < stageTop + stageH) {
+        const p = clamp((y - stageTop) / (stageH - vh));
+        const open = ease(span(p, 0, 0.55));
+        if (!still) rot += dt * 0.007;
+        const turn = rot + p * 240;
+
+        const drumR = W * 0.25;
+        const ringR = Math.min(W * 0.3, vw * 0.44);
+        const drumScale = (Math.PI * 2 * drumR) / N / (W * 0.085);
+        tiltEl.style.transform = `translateY(${mix(vh * 0.11, vh * 0.02, open).toFixed(1)}px) rotateX(${mix(-9, -24, open).toFixed(2)}deg)`;
+        spinEl.style.transform = `rotateY(${(-turn).toFixed(2)}deg)`;
+        spinEl.style.setProperty("--r", `${mix(drumR, ringR, open).toFixed(1)}px`);
+        spinEl.style.setProperty("--fin", `${mix(0, 72, open).toFixed(2)}deg`);
+        spinEl.style.setProperty("--sx", mix(drumScale * 1.02, 1, open).toFixed(4));
+        spinEl.style.setProperty("--sy", mix(1, 0.72, open).toFixed(4));
+        stageEl.style.setProperty("--open", open.toFixed(4));
+        const isOpen = String(open > 0.9);
+        if (stageEl.dataset.open !== isOpen) stageEl.dataset.open = isOpen;
+
+        // The card turned most toward the viewer names its project.
+        const facing = Math.round((((turn % 360) + 360) % 360) / (360 / N)) % N;
+        if (cards[facing].project !== shownFront) {
+          shownFront = cards[facing].project;
+          setFront(shownFront);
+        }
       }
 
-      // The lamp
-      const progress = clamp(y / S);
-      const tour = span(progress, OPEN_END, 1);
-      const past = y >= S + F;
-      open += ((past ? 0 : ease(span(progress, 0, OPEN_END))) - open) * (past ? 1 : follow(0.12));
-
-      if (progress >= OPEN_END && !past) {
-        const position = 0.2 + tour * (projects.length - 0.4);
-        const goal = -90 - position * SECTOR;
-        rot += (((((goal - rot) % 360) + 540) % 360) - 180) * follow(0.08);
-        setActive(Math.min(projects.length - 1, Math.floor(position)));
-        setTouring(open > 0.9);
-      } else {
-        if (!still) rot += dt * 0.005;
-        setTouring(false);
+      // The walkthrough grows out of the dark until it fills the screen.
+      if (y > reelTop - vh * 2) loadFilm();
+      if (y + vh > reelTop && y < reelTop + reelH) {
+        const q = clamp((y - reelTop) / (reelH - vh));
+        const grow = still ? 1 : ease(span(q, 0, 0.3));
+        const small = Math.min(vw * 0.1, 160);
+        const w = mix(small, vw, grow);
+        const h = mix((small * 9) / 16, vh, grow);
+        boxEl.style.clipPath = `inset(${((vh - h) / 2).toFixed(1)}px ${((vw - w) / 2).toFixed(1)}px round ${mix(4, 0, grow).toFixed(1)}px)`;
+        canvas.style.transform = `scale(${mix(1.35, 1, grow).toFixed(4)})`;
+        filmT += (span(q, 0.02, 0.97) - filmT) * (still ? 1 : 0.08);
+        drawFilm(filmT * (filmFrames.count - 1));
+        const c = film.findIndex((s) => q >= s.from && q <= s.to);
+        if (c !== shownCaption) {
+          shownCaption = c;
+          setCaption(c);
+        }
       }
-      stageEl.style.setProperty("--open", open.toFixed(4));
-      ringEl.style.transform = `rotateY(${rot.toFixed(3)}deg)`;
 
-      // The film
-      const f = clamp((y - S + vh) / F);
-      const showing = f > 0 && y < S + F + vh;
-      canvas.style.visibility = showing ? "visible" : "hidden";
-      if (showing) {
-        openKeyhole(ease(span(f, 0, 0.1)));
-        filmT += (span(f, 0.03, 1) - filmT) * follow(0.1);
-        filmScene?.draw(filmT);
-        setCaption(film.findIndex((c) => f >= c.from && f <= c.to));
-        const burn = ease(span(f, 0.86, 0.95));
-        const white = ease(span(f, 0.94, 1));
-        flashEl.style.opacity = String(burn);
-        flashEl.style.background = `color-mix(in srgb, var(--snow) ${white * 100}%, var(--lava))`;
-      } else {
-        setCaption(-1);
-        flashEl.style.opacity = "0";
-      }
-      stageEl.style.visibility = f >= 0.12 && y < max - vh * 1.2 ? "hidden" : "visible";
-
-      // The joint
-      if (y + vh > jointTop && y < jointTop + jointHeight) {
-        const p = clamp((y - jointTop) / (jointHeight - vh));
-        jointT += (p - jointT) * follow(0.1);
-        jointScene?.draw(jointT);
-        setJointLine(Math.min(joint.length - 1, Math.floor(p * joint.length)));
+      // How he works: one step at a time.
+      if (y + vh > stepsTop && y < stepsTop + stepsH) {
+        const r = clamp((y - stepsTop) / (stepsH - vh));
+        const s = Math.min(steps.length - 1, Math.floor(r * steps.length));
+        if (s !== shownStep) {
+          shownStep = s;
+          setStep(s);
+        }
       }
 
       frame = requestAnimationFrame(tick);
@@ -188,121 +203,163 @@ export function Experience() {
     frame = requestAnimationFrame(tick);
 
     return () => {
-      gone = true;
       cancelAnimationFrame(frame);
       observer.disconnect();
       window.removeEventListener("resize", measure);
       history.scrollRestoration = previous;
-      filmScene?.dispose();
-      jointScene?.dispose();
     };
   }, []);
 
+  const done = () => {
+    setLoading(false);
+    window.lenis?.start();
+  };
+
   return (
     <>
-      <section className="stage" ref={stage} data-touring={touring}>
-        <div className="spill" aria-hidden />
+      {loading && <Loader images={cards.map((c) => c.src)} onLift={() => setReady(true)} onDone={done} />}
 
-        <h1 className="stage__name">{site.name}</h1>
+      <section className="stage" ref={stage} data-ready={ready}>
+        <div className="stage__pin">
+          <h1 className="stage__name" aria-label={site.fullName}>
+            {site.fullName.split(" ").map((word) => (
+              <span key={word} className="mask" aria-hidden>
+                <span>{word}</span>
+              </span>
+            ))}
+          </h1>
 
-        <div className="scene" aria-hidden>
-          <div className="tilt">
-            <div className="lamp" ref={lamp} />
-            <div className="ring" ref={ring}>
-              {cards.map((card, i) => (
-                <Link
-                  key={i}
-                  href={`/work/${card.slug}`}
-                  tabIndex={-1}
-                  className="slat"
-                  data-on={!touring || card.project === active}
-                  style={{ "--angle": `${(i / cards.length) * 360}deg` } as React.CSSProperties}
-                >
-                  <img src={card.src} alt="" draggable={false} />
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="stage__foot">
-          <p className="stage__intro">{site.intro}</p>
-          <a className="talk" href="#contact">
-            Let’s talk <span aria-hidden>→</span>
-          </a>
-        </div>
-
-        <ul className="tour">
-          {projects.map((p, i) => (
-            <li key={p.slug} className="tour__item" data-on={touring && i === active}>
-              <h2 className="tour__title">{p.title}</h2>
-              <p className="tour__line">{p.line}</p>
-              <Link className="talk" href={`/work/${p.slug}`} tabIndex={touring && i === active ? 0 : -1}>
-                See the project <span aria-hidden>→</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <canvas className="film" ref={filmCanvas} aria-hidden />
-      <div className="captions">
-        {film.map((c, i) => (
-          <p key={c.text} data-on={i === caption}>
-            {c.text}
-          </p>
-        ))}
-      </div>
-      <div className="flash" ref={flash} aria-hidden />
-
-      <div className="page">
-        <div className="hold hold--stage" ref={holdStage}>
-          <span className="anchor" id="work" />
-        </div>
-        <div className="hold hold--film" ref={holdFilm} />
-
-        <div className="lit">
-          <section className="about" id="about">
-            <div className="about__head">
-              <h2 className="headline">{about.headline}</h2>
-              <p className="about__line">{about.line}</p>
-            </div>
-            {site.portrait && <img className="about__portrait" src={site.portrait} alt={site.name} />}
-            <div className="about__story">
-              {about.story.map((p) => (
-                <p key={p}>{p}</p>
-              ))}
-            </div>
-          </section>
-
-          <section className="stance">
-            <h2 className="headline">{about.stance}</h2>
-            <p className="about__line">{about.stanceLine}</p>
-          </section>
-
-          <div className="hold--joint" ref={holdJoint}>
-            <div className="joint">
-              <canvas className="joint__canvas" ref={jointCanvas} aria-hidden />
-              <div className="joint__text">
-                {joint.map((line, i) => (
-                  <p key={line} data-on={i === jointLine}>
-                    {line}
-                  </p>
+          <div className="drum" aria-hidden>
+            <div className="drum__tilt" ref={tilt}>
+              <div className="drum__spin" ref={spin}>
+                {cards.map((card, i) => (
+                  <Link
+                    key={i}
+                    href={`/work/${card.slug}`}
+                    tabIndex={-1}
+                    className={card.slug === "hubtown-seasons" ? "card card--paper" : "card"}
+                    style={{ "--a": `${(i / N) * 360}deg` } as React.CSSProperties}
+                  >
+                    <img src={card.src} alt="" draggable={false} />
+                  </Link>
                 ))}
               </div>
             </div>
           </div>
 
-          <section className="notes">
-            <p>{about.process}</p>
-            <p>{about.influences}</p>
-            <p>{about.films}</p>
-          </section>
-        </div>
+          <div className="stage__foot">
+            <p className="stage__intro">{site.intro}</p>
+            <a className="talk" href="#contact">
+              Let’s talk <span aria-hidden>→</span>
+            </a>
+          </div>
 
-        <Footer />
-        <div className="hold hold--loop" />
-      </div>
+          <div className="stage__work">
+            <h2 className="stage__title">Four rooms, so far.</h2>
+            <ul className="stage__names">
+              {projects.map((p, i) => (
+                <li key={p.slug} data-on={i === front}>
+                  <Link href={`/work/${p.slug}`}>
+                    <span className="stage__project">{p.title}</span>
+                    <span className="stage__line">{p.line}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section className="reel" ref={reel} aria-label="Shararat, a walkthrough">
+        <div className="reel__pin">
+          <div className="reel__frame" ref={frameBox}>
+            <canvas ref={canvasRef} role="img" aria-label="Walkthrough of Shararat" />
+          </div>
+          <p className="reel__label">Shararat, a walkthrough</p>
+          <div className="reel__captions">
+            {film.map((c, i) => (
+              <p key={c.text} data-on={i === caption}>
+                {c.text}
+              </p>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="work" id="work">
+        <h2 className="work__title">Selected projects</h2>
+        <div className="work__grid">
+          {projects.map((p) => {
+            const image = work[p.slug][p.cover];
+            return (
+              <Link key={p.slug} href={`/work/${p.slug}`} className={image.kind === "drawing" ? "tile tile--paper" : "tile"}>
+                <div className="tile__image">
+                  <Image src={image.src} alt={image.alt} fill sizes="(max-width: 760px) 100vw, 50vw" />
+                </div>
+                <div className="tile__meta">
+                  <span className="tile__name">{p.title}</span>
+                  <span>{p.tags[0]}</span>
+                  <span>{p.tags[1]}</span>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="steps" ref={stepsRef} aria-label="How I work">
+        <div className="steps__pin">
+          <p className="steps__label">How I think, on one project</p>
+          <ol className="steps__list">
+            {steps.map((s, i) => (
+              <li key={s.name} data-on={i === step}>
+                {s.name}
+              </li>
+            ))}
+          </ol>
+          <div className="steps__card">
+            <div className="steps__images">
+              {steps.map((s, i) => (
+                <img key={s.name} src={s.src} alt={s.alt} data-on={i === step} data-paper={s.paper} loading="lazy" />
+              ))}
+            </div>
+            <p className="steps__line">{steps[step].line}</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="about" id="about">
+        <p className="about__lead">{about.lead}</p>
+        <div className="about__row">
+          <figure className="about__picture">
+            {site.portrait ? (
+              <img src={site.portrait} alt={site.fullName} />
+            ) : (
+              <img src={work.sketchbook["page-2"].src} alt={work.sketchbook["page-2"].alt} loading="lazy" />
+            )}
+          </figure>
+          <div className="about__text">
+            <p className="about__stance">{about.stance}</p>
+            {notes.map((n) => (
+              <p key={n}>{n}</p>
+            ))}
+            <a className="talk" href="#contact">
+              Let’s talk <span aria-hidden>→</span>
+            </a>
+          </div>
+        </div>
+        <dl className="cv">
+          {cv.map((c) => (
+            <div key={c.role + c.place}>
+              <dt>{c.role}</dt>
+              <dd>{c.place}</dd>
+              <dd className="cv__when">{c.when}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      <Footer />
     </>
   );
 }

@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
-import { Instrument_Sans, Newsreader } from "next/font/google";
+import { Instrument_Sans, Instrument_Serif } from "next/font/google";
 import type { ReactNode } from "react";
 import { Header } from "@/components/Header";
+import { SmoothScroll } from "@/components/SmoothScroll";
 import { site } from "@/content/site";
 import "./globals.css";
 
-const serif = Newsreader({
+const serif = Instrument_Serif({
   subsets: ["latin"],
-  axes: ["opsz"],
+  weight: "400",
+  style: ["normal", "italic"],
   variable: "--font-serif",
 });
 const sans = Instrument_Sans({
@@ -16,7 +18,7 @@ const sans = Instrument_Sans({
 });
 
 export const metadata: Metadata = {
-  title: { default: `${site.name}, interior design`, template: `%s, ${site.name}` },
+  title: { default: `${site.fullName}, interior design`, template: `%s, ${site.fullName}` },
   description: site.intro,
   robots: site.draft ? { index: false, follow: false } : undefined,
 };
@@ -27,6 +29,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <Header />
         <main>{children}</main>
+        <SmoothScroll />
       </body>
     </html>
   );
