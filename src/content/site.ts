@@ -40,6 +40,47 @@ export const site = {
   socials: [] as { label: string; url: string }[],
 };
 
+// The turn after the landing. Three words on paper sink into a line, the page goes dark,
+// and what he starts from rises out of it. Then the words scatter into a field and tilt away.
+export const creed = {
+  eyebrow: "Three words I hold every room to.",
+  light: ["Intriguing", "Accessible", "Thoughtful"],
+  dark: ["Feeling", "before", "form."],
+  line: "Before a single line is drawn, I ask how the room should feel, and who it is for.",
+  // The field: his words, large, and what people do in a room, small.
+  big: ["Feeling", "Form", "People", "Light", "Intriguing", "Accessible", "Thoughtful"],
+  small: ["Sit", "Stay", "Linger", "Touch", "Look up", "Walk in"],
+};
+
+// Before the contact: who he'd love to design for, and who he isn't for. Drawn from what he says
+// he believes: the feeling and the people first, sketching first, and a person's own taste over a default.
+export const fit = {
+  title: "Who I’d love to design for.",
+  yes: {
+    label: "For you if you",
+    items: [
+      "Want a room that feels like the people in it.",
+      "Already have a look you love, and want it taken further.",
+      "Would rather have character than minimal by default.",
+      "Care how the light falls, not just where the sofa goes.",
+      "Like seeing it sketched before it’s drawn.",
+      "Have a story the space should tell.",
+    ],
+  },
+  no: {
+    label: "Probably not for",
+    items: [
+      "Anyone after a copy of a Pinterest board.",
+      "Rooms meant to look like every other room.",
+      "Spaces designed for a photo, not the people in them.",
+      "Projects that skip the sketching.",
+      "Anyone who wants it done without asking why.",
+    ],
+  },
+  prompt: "Tick what sounds like you.",
+  match: "Sounds like we should talk",
+};
+
 // The opening, set while the site loads. The words after the lead fall into the grid one by one.
 export const hook = {
   lead: "Every room begins",
@@ -52,12 +93,12 @@ export const about = {
   stance: "Minimal became the default. Personal taste paid for it. I design for the visual direction a person already has.",
 };
 
-// A short piece in his words.
+// A short piece in his words, as a small index: a label, then the line.
 export const notes = [
-  "I grew up in Prabhadevi, sketching. My parents backed every choice I made.",
-  "Interior design started as a minor in my first year. One project went well, and I stayed.",
-  "Sameer Kulavoor for his forms. Sanjay Puri for sketching first. Sajid Wajid Shaikh for moving between mediums.",
-  "Away from the drawing board I’m a cinephile. Inglourious Basterds, Interstellar and Kung Fu Panda share a shelf.",
+  { label: "Where", text: "I grew up in Prabhadevi, sketching. My parents backed every choice I made." },
+  { label: "How it began", text: "Interior design started as a minor in my first year. One project went well, and I stayed." },
+  { label: "Who I look to", text: "Sameer Kulavoor for his forms. Sanjay Puri for sketching first. Sajid Wajid Shaikh for moving between mediums." },
+  { label: "Off the board", text: "I’m a cinephile. Inglourious Basterds, Interstellar and Kung Fu Panda share a shelf." },
 ];
 
 // How a project moves, shown on Maatik. Each step names an image in media.json.
@@ -65,26 +106,28 @@ export const process = [
   { name: "Sketch", line: "After a first round of research I sketch every idea I have. The sketches tell me where to go.", image: "sketch" },
   { name: "Study", line: "Then I refine it and think in 3D. For Maatik, the roof came before the model.", image: "study-truss" },
   { name: "Plan", line: "Then the CAD and the technical part. Where the wheel sits, where the café opens.", image: "plan" },
-  { name: "Section", line: "The cut through the banyan court. The brick, the stone and the high ceilings stay.", image: "section" },
   { name: "Render", line: "Then the renders. I go back and change any of it whenever something gives me a better answer.", image: "facade" },
 ];
 
-// His CV, kept short.
-export const cv = [
-  { role: "Interior design", place: "ISDI, Atlas SkillTech University", when: "2023 to 2027" },
-  { role: "Spatial graphic designer", place: "Alvarez & Marsal", when: "2026" },
-  { role: "Exhibit designer", place: "Freeform × IFLA", when: "2025" },
-  { role: "Interior design intern", place: "Essence of Art", when: "" },
-  { role: "Interior design intern", place: "Space X", when: "" },
-  { role: "Mural", place: "Closed Bonet", when: "2023" },
-];
+// His CV as a journey, in order. The internships have no dates, so they sit "along the way".
+export const journey = {
+  title: "The road so far",
+  stops: [
+    { when: "2023", what: "Began interior design", where: "ISDI, Atlas SkillTech University" },
+    { when: "2023", what: "Painted a mural", where: "Closed Bonet" },
+    { when: "Along the way", what: "Interned in interior design", where: "Essence of Art, and Space X" },
+    { when: "2025", what: "Designed an exhibit", where: "Freeform × IFLA" },
+    { when: "2026", what: "Spatial graphic designer", where: "Alvarez & Marsal" },
+    { when: "2027", what: "Graduating", where: "ISDI, Atlas SkillTech University" },
+  ],
+};
 
 // Timed against the walkthrough's scroll, from 0 to 1. Lines from his portfolio and the brand book.
 export const film = [
-  { text: "You weren’t supposed to find this. And yet here you are.", from: 0.3, to: 0.44 },
-  { text: "A forgotten jazz club in 1996, inside a tropical hotel.", from: 0.48, to: 0.62 },
-  { text: "Somewhere to sit back, listen to vinyl and stay for hours.", from: 0.66, to: 0.78 },
-  { text: "Mischief was always going to find you. It just needed the right room.", from: 0.82, to: 0.95 },
+  { text: "You weren’t supposed to find this. And yet here you are.", from: 0.1, to: 0.26 },
+  { text: "A forgotten jazz club in 1996, inside a tropical hotel.", from: 0.32, to: 0.48 },
+  { text: "Somewhere to sit back, listen to vinyl and stay for hours.", from: 0.54, to: 0.7 },
+  { text: "Mischief was always going to find you. It just needed the right room.", from: 0.76, to: 0.93 },
 ];
 
 // In the order they appear on the home page.

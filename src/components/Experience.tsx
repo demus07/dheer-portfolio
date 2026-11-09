@@ -3,17 +3,51 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { about, cv, film, filmFrames, notes, process, projects, ringCards, site, sketches, work } from "@/content/site";
+import { film, filmFrames, process, projects, ringCards, site, sketches, work } from "@/content/site";
+import { Creed } from "./Creed";
+import { About } from "./About";
+import { Fit } from "./Fit";
 import { Footer } from "./Footer";
+import { Journey } from "./Journey";
 import { Loader } from "./Loader";
+import { onFrame } from "@/lib/ticker";
 
 const cards = projects.flatMap((p, i) => ringCards[p.slug].map((src) => ({ src, project: i, slug: p.slug })));
 const N = cards.length;
+// How he works, on Maatik. Each drawing is laid straight onto the page; the last is the room itself.
+// "line" drawings sit whole on the paper, "pencil" photos of paper fill it, "real" is the render.
 const steps = process.map((s) =>
   s.image === "sketch"
-    ? { ...s, src: sketches.maatik.src, alt: "Maatik, first sketch", paper: true }
-    : { ...s, src: work.maatik[s.image].src, alt: work.maatik[s.image].alt, paper: s.image !== "facade" },
+    ? { ...s, src: sketches.maatik.src, alt: "Maatik, first sketch", look: "line" }
+    : {
+        ...s,
+        src: work.maatik[s.image].src,
+        alt: work.maatik[s.image].alt,
+        look: s.image === "facade" ? "real" : work.maatik[s.image].kind === "pencil" ? "pencil" : "line",
+      },
 );
+
+// The projects, as Santal shows its works: a full-bleed wall of pictures in three columns.
+// The four projects take turns down the wall. Hubtown has only drawings, so one is shown on paper.
+const shots = (() => {
+  const picks: [string, string[]][] = [
+    ["shararat", ["bar", "lounge", "mezzanine", "vinyl", "booths", "library", "passage"]],
+    ["maatik", ["facade", "cafe", "workshop", "lounge", "swing", "library", "office"]],
+    ["light-of-bharat", ["dining", "counter", "today", "bar", "chess"]],
+    ["hubtown-seasons", ["passage"]],
+  ];
+  const lists = picks.map(([slug, names]) => {
+    const title = projects.find((p) => p.slug === slug)!.title;
+    return names.map((n) => ({ ...work[slug][n], slug, title, paper: work[slug][n].kind === "drawing" }));
+  });
+  const out: (typeof lists)[number] = [];
+  for (let i = 0; out.length < lists.flat().length; i++) for (const l of lists) if (l[i]) out.push(l[i]);
+  return out;
+})();
+const columns = [0, 1, 2].map((c) => shots.filter((_, i) => i % 3 === c));
+// How far each column starts below the others, in screens. The middle one leads, as on Santal.
+// After that each column slides at its own pace, set by its height so all three finish level.
+const lag = [0.55, 0.15, 0.36];
 
 const clamp = (n: number) => Math.min(1, Math.max(0, n));
 const ease = (n: number) => n * n * (3 - 2 * n);
@@ -22,7 +56,7 @@ const mix = (a: number, b: number, t: number) => a + (b - a) * t;
 const frameSrc = (i: number) => `/film/${String(i).padStart(3, "0")}.webp`;
 
 // The home page. His name over a drum of his renders, which opens into a ring as you scroll.
-// Then his Shararat walkthrough grows out of the dark, the projects, how he works, and him.
+// Then three words on paper turn into what he starts from, his Shararat walkthrough grows out of the dark, the projects, how he works, and him.
 export function Experience() {
   const stage = useRef<HTMLElement>(null);
   const tilt = useRef<HTMLDivElement>(null);
@@ -31,6 +65,14 @@ export function Experience() {
   const frameBox = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stepsRef = useRef<HTMLElement>(null);
+  const worksRef = useRef<HTMLElement>(null);
+  const colRefs = useRef<HTMLDivElement[]>([]);
+  const stepsPin = useRef<HTMLDivElement>(null);
+  const layers = useRef<HTMLDivElement[]>([]);
+  const realRef = useRef<HTMLImageElement>(null);
+  const washRef = useRef<HTMLImageElement>(null);
+  const linesRef = useRef<HTMLImageElement>(null);
+  const stepsTitle = useRef<HTMLHeadingElement>(null);
 
   const [loading, setLoading] = useState(true);
   const [ready, setReady] = useState(false);
@@ -43,10 +85,11 @@ export function Experience() {
     const tiltEl = tilt.current!;
     const spinEl = spin.current!;
     const reelEl = reel.current!;
-    const boxEl = frameBox.current!;
     const canvas = canvasRef.current!;
     const context = canvas.getContext("2d");
     const stepsEl = stepsRef.current!;
+    const boxEl = frameBox.current!;
+    const worksEl = worksRef.current!;
 
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const previous = history.scrollRestoration;
@@ -62,9 +105,12 @@ export function Experience() {
     let reelH = 0;
     let stepsTop = 0;
     let stepsH = 0;
+    let decoded = false;
+    let worksTop = 0;
+    let worksH = 0;
+    let colH: number[] = [];
     let rot = 0;
     let last = performance.now();
-    let frame = 0;
     let filmT = 0;
     let drawn = -1;
     let shownFront = -1;
@@ -126,6 +172,9 @@ export function Experience() {
       reelH = reelEl.offsetHeight;
       stepsTop = top(stepsEl);
       stepsH = stepsEl.offsetHeight;
+      worksTop = top(worksEl);
+      worksH = worksEl.offsetHeight;
+      colH = colRefs.current.map((c) => c.offsetHeight);
       canvas.width = Math.min(vw, 1600);
       canvas.height = Math.round((canvas.width * vh) / vw);
       drawn = -1;
@@ -140,8 +189,10 @@ export function Experience() {
       if (y < stageTop + stageH) {
         const p = clamp((y - stageTop) / (stageH - vh));
         const open = ease(span(p, 0, 0.55));
-        if (!still) rot += dt * 0.007;
-        const turn = rot + p * 240;
+        // It drifts on its own, slowing as it opens, and the scroll adds only a gentle quarter turn,
+        // so the ring never whips round under the reader.
+        if (!still) rot += dt * mix(0.006, 0.0025, open);
+        const turn = rot + ease(p) * 90;
 
         const drumR = W * 0.25;
         const ringR = Math.min(W * 0.3, vw * 0.44);
@@ -164,17 +215,17 @@ export function Experience() {
         }
       }
 
-      // The walkthrough grows out of the dark until it fills the screen.
-      if (y > reelTop - vh * 2) loadFilm();
+      // The walkthrough arrives full screen out of the dive, and the scroll plays it.
+      if (y > reelTop - vh * 4) loadFilm();
       if (y + vh > reelTop && y < reelTop + reelH) {
         const q = clamp((y - reelTop) / (reelH - vh));
-        const grow = still ? 1 : ease(span(q, 0, 0.3));
-        const small = Math.min(vw * 0.1, 160);
-        const w = mix(small, vw, grow);
-        const h = mix((small * 9) / 16, vh, grow);
-        boxEl.style.clipPath = `inset(${((vh - h) / 2).toFixed(1)}px ${((vw - w) / 2).toFixed(1)}px round ${mix(4, 0, grow).toFixed(1)}px)`;
-        canvas.style.transform = `scale(${mix(1.35, 1, grow).toFixed(4)})`;
-        filmT += (span(q, 0.02, 0.97) - filmT) * (still ? 1 : 0.08);
+        filmT += (span(q, 0.02, 0.9) - filmT) * (still ? 1 : 0.18);
+        // At the end the film closes from both sides to a hairline, as Santal's last panel turns edge-on.
+        const shut = ease(span(q, 0.9, 0.98));
+        boxEl.style.clipPath =
+          shut > 0 ? `inset(${(shut * 15).toFixed(2)}svh calc(${(shut * 50).toFixed(3)}% - ${shut.toFixed(3)}px))` : "none";
+        boxEl.style.opacity = String(1 - span(q, 0.985, 1));
+        reelEl.style.setProperty("--shut", shut.toFixed(3));
         drawFilm(filmT * (filmFrames.count - 1));
         const c = film.findIndex((s) => q >= s.from && q <= s.to);
         if (c !== shownCaption) {
@@ -183,27 +234,78 @@ export function Experience() {
         }
       }
 
-      // How he works: one step at a time.
+      // The projects rise from below, the middle column first, and the columns keep their own pace.
+      // Their title comes up at the top only once the section has, so it never slides across the film.
+      if (y + vh > worksTop && y < worksTop + worksH) {
+        worksEl.style.setProperty("--label", span(y, worksTop - vh * 0.2, worksTop).toFixed(3));
+        const rise = still ? 1 : ease(span(y, worksTop - vh, worksTop + vh * 0.6));
+        const along = clamp((y - worksTop) / Math.max(1, worksH - vh));
+        colRefs.current.forEach((col, i) => {
+          const off = still ? 0 : lag[i] * vh * (1 - rise) + (Math.max(...colH) - colH[i]) * along;
+          col.style.transform = `translate3d(0, ${off.toFixed(2)}px, 0)`;
+        });
+      }
+
+      // How he works. Each drawing sweeps in over the last, so its lines turn into the next ones,
+      // while the last one swells and fades. The render arrives as a grey wash and develops into colour.
+      // Decode the big drawings well before they show, off the main thread, so none stalls a frame.
+      if (!decoded && y > stepsTop - vh * 3) {
+        decoded = true;
+        stepsEl.querySelectorAll("img").forEach((img) => img.decode().catch(() => {}));
+      }
       if (y + vh > stepsTop && y < stepsTop + stepsH) {
+        // The title rises into the middle, word by word, as the section arrives.
+        stepsTitle.current!.style.setProperty("--in", span(y, stepsTop - vh * 0.85, stepsTop - vh * 0.05).toFixed(4));
         const r = clamp((y - stepsTop) / (stepsH - vh));
-        const s = Math.min(steps.length - 1, Math.floor(r * steps.length));
+        const n = steps.length;
+        const S = r * (n - 0.4);
+        const plan = n - 2;
+        layers.current.forEach((el, i) => {
+          if (i === n - 1) return;
+          const inn = i === 0 ? 1 : ease(span(S, i - 0.5, i));
+          el.style.setProperty("--m", inn.toFixed(4));
+          if (i === plan) {
+            // The plan lies down and becomes the floor the building stands on.
+            const lie = still ? 0 : ease(span(S, n - 1.65, n - 1.2));
+            const gone = ease(span(S, n - 1.45, n - 1.1));
+            el.style.visibility = inn <= 0 || gone >= 1 ? "hidden" : "visible";
+            el.style.opacity = (1 - gone).toFixed(4);
+            el.style.transform = `translate3d(0, ${(lie * 22).toFixed(3)}svh, 0) rotateX(${(lie * 76).toFixed(3)}deg) scale(${(1.06 - 0.06 * inn).toFixed(4)})`;
+            return;
+          }
+          const out = ease(span(S, i + 0.5, i + 1));
+          el.style.visibility = inn <= 0 || out >= 1 ? "hidden" : "visible";
+          el.style.opacity = (1 - out).toFixed(4);
+          el.style.transform = still ? "none" : `scale(${(1.06 - 0.06 * inn + 0.1 * out).toFixed(4)})`;
+        });
+        // The facade stands up out of it as a pen drawing, takes on tone, then becomes the render.
+        const render = layers.current[n - 1];
+        const rise = ease(span(S, n - 1.55, n - 1.1));
+        render.style.visibility = rise <= 0 ? "hidden" : "visible";
+        render.style.transform = still ? "none" : `rotateX(${(-88 * (1 - rise)).toFixed(3)}deg)`;
+        render.style.opacity = still ? rise.toFixed(4) : "1";
+        washRef.current!.style.opacity = ease(span(S, n - 1.15, n - 0.85)).toFixed(4);
+        realRef.current!.style.opacity = ease(span(S, n - 0.95, n - 0.55)).toFixed(4);
+        linesRef.current!.style.opacity = (1 - ease(span(S, n - 0.7, n - 0.45))).toFixed(4);
+        const dark = String(S > n - 0.9);
+        if (stepsPin.current!.dataset.dark !== dark) stepsPin.current!.dataset.dark = dark;
+        const s = Math.min(n - 1, Math.floor(S + 0.3));
         if (s !== shownStep) {
           shownStep = s;
           setStep(s);
         }
       }
 
-      frame = requestAnimationFrame(tick);
     };
 
     measure();
     window.addEventListener("resize", measure);
     const observer = new ResizeObserver(measure);
     observer.observe(document.body);
-    frame = requestAnimationFrame(tick);
+    const off = onFrame(tick);
 
     return () => {
-      cancelAnimationFrame(frame);
+      off();
       observer.disconnect();
       window.removeEventListener("resize", measure);
       history.scrollRestoration = previous;
@@ -248,7 +350,9 @@ export function Experience() {
           </div>
 
           <div className="stage__foot">
-            <p className="stage__intro">{site.intro}</p>
+            <p className="stage__intro">
+              {site.role}, {site.location}
+            </p>
             <a className="talk" href="#contact">
               Let’s talk <span aria-hidden>→</span>
             </a>
@@ -270,6 +374,8 @@ export function Experience() {
         </div>
       </section>
 
+      <Creed />
+
       <section className="reel" ref={reel} aria-label="Shararat, a walkthrough">
         <div className="reel__pin">
           <div className="reel__frame" ref={frameBox}>
@@ -286,78 +392,80 @@ export function Experience() {
         </div>
       </section>
 
-      <section className="work" id="work">
-        <h2 className="work__title">Selected projects</h2>
-        <div className="work__grid">
-          {projects.map((p) => {
-            const image = work[p.slug][p.cover];
-            return (
-              <Link key={p.slug} href={`/work/${p.slug}`} className={image.kind === "drawing" ? "tile tile--paper" : "tile"}>
-                <div className="tile__image">
-                  <Image src={image.src} alt={image.alt} fill sizes="(max-width: 760px) 100vw, 50vw" />
-                </div>
-                <div className="tile__meta">
-                  <span className="tile__name">{p.title}</span>
-                  <span>{p.tags[0]}</span>
-                  <span>{p.tags[1]}</span>
-                </div>
-              </Link>
-            );
-          })}
+      <section className="works" id="work" ref={worksRef} aria-labelledby="works-title">
+        <h2 id="works-title" className="works__label">
+          Selected projects
+        </h2>
+        <div className="works__cols">
+          {columns.map((column, c) => (
+            <div
+              key={c}
+              className="works__col"
+              ref={(n) => {
+                if (n) colRefs.current[c] = n;
+              }}
+            >
+              {column.map((shot) => (
+                <Link key={shot.src} href={`/work/${shot.slug}`} className="shot" data-paper={shot.paper} aria-label={`${shot.title}, ${shot.alt}`}>
+                  <Image src={shot.src} alt={shot.alt} width={shot.width} height={shot.height} sizes="(max-width: 760px) 50vw, 33vw" />
+                  <span className="shot__name" aria-hidden>
+                    {shot.title}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          ))}
         </div>
       </section>
 
-      <section className="steps" ref={stepsRef} aria-label="How I work">
-        <div className="steps__pin">
-          <p className="steps__label">How I think, on one project</p>
+      <section className="steps" ref={stepsRef} aria-label="How I think, on one project">
+        <div className="steps__pin" ref={stepsPin} data-dark="false">
+          {steps.map((s, i) => (
+            <div
+              key={s.name}
+              className="steps__layer"
+              data-look={s.look}
+              ref={(n) => {
+                if (n) layers.current[i] = n;
+              }}
+            >
+              {s.look === "real" ? (
+                <>
+                  <img className="steps__lines" ref={linesRef} src="/steps/maatik-facade-lines.webp" alt="" decoding="async" />
+                  <img className="steps__wash" ref={washRef} src={s.src} alt="" decoding="async" />
+                  <img className="steps__real" ref={realRef} src={s.src} alt={s.alt} decoding="async" />
+                </>
+              ) : (
+                <img src={s.src} alt={s.alt} decoding="async" />
+              )}
+            </div>
+          ))}
+          <div className="steps__shade" aria-hidden />
+          <h2 className="steps__title" ref={stepsTitle}>
+            {"How I think, on one project".split(" ").map((w, i) => (
+              <span key={i} className="steps__word">
+                <span style={{ "--i": i } as React.CSSProperties}>{w}</span>
+              </span>
+            ))}
+          </h2>
           <ol className="steps__list">
             {steps.map((s, i) => (
-              <li key={s.name} data-on={i === step}>
+              <li key={s.name} data-on={i === step} aria-current={i === step ? "step" : undefined}>
                 {s.name}
               </li>
             ))}
           </ol>
-          <div className="steps__card">
-            <div className="steps__images">
-              {steps.map((s, i) => (
-                <img key={s.name} src={s.src} alt={s.alt} data-on={i === step} data-paper={s.paper} loading="lazy" />
-              ))}
-            </div>
-            <p className="steps__line">{steps[step].line}</p>
-          </div>
+          <p className="steps__line" aria-live="polite">
+            {steps[step].line}
+          </p>
         </div>
       </section>
 
-      <section className="about" id="about">
-        <p className="about__lead">{about.lead}</p>
-        <div className="about__row">
-          <figure className="about__picture">
-            {site.portrait ? (
-              <img src={site.portrait} alt={site.fullName} />
-            ) : (
-              <img src={work.sketchbook["page-2"].src} alt={work.sketchbook["page-2"].alt} loading="lazy" />
-            )}
-          </figure>
-          <div className="about__text">
-            <p className="about__stance">{about.stance}</p>
-            {notes.map((n) => (
-              <p key={n}>{n}</p>
-            ))}
-            <a className="talk" href="#contact">
-              Let’s talk <span aria-hidden>→</span>
-            </a>
-          </div>
-        </div>
-        <dl className="cv">
-          {cv.map((c) => (
-            <div key={c.role + c.place}>
-              <dt>{c.role}</dt>
-              <dd>{c.place}</dd>
-              <dd className="cv__when">{c.when}</dd>
-            </div>
-          ))}
-        </dl>
-      </section>
+      <About />
+
+      <Journey />
+
+      <Fit />
 
       <Footer />
     </>

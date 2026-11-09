@@ -84,8 +84,6 @@ img {
 .stage__name,
 .stage__title,
 .stage__project,
-.work__title,
-.tile__name,
 .steps__list,
 .about__lead,
 .project__title,
@@ -505,13 +503,189 @@ body:has(.loader) .header {
   color: var(--dusty);
 }
 
+/* The turn: three words on paper sink into a horizon, the dark closes on it,
+   and "Feeling before form" rises, scatters into a field of words and tips away. */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* 1160 screens: the last 100 overlap the walkthrough, which waits pinned underneath. */
+.creed {
+  position: relative;
+  z-index: 2;
+  height: 1160svh;
+  margin-bottom: -100svh;
+}
+
+.creed__pin {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  background: var(--snow);
+  isolation: isolate;
+}
+
+.creed__curtain {
+  position: absolute;
+  inset-inline: 0;
+  height: 50%;
+  background: var(--void);
+  transform: scaleY(0);
+}
+
+.creed__curtain--top {
+  top: 0;
+  transform-origin: top;
+}
+
+.creed__curtain--bottom {
+  bottom: 0;
+  transform-origin: bottom;
+}
+
+/* Black text on paper, white on the dark: the layer inverts whatever is under it. */
+.creed__light {
+  position: absolute;
+  inset: 0;
+  color: #fff;
+  mix-blend-mode: difference;
+  pointer-events: none;
+}
+
+.creed__eyebrow {
+  position: absolute;
+  top: calc(var(--header) + 14svh);
+  left: calc(25% + var(--gutter) / 2);
+  font-size: 14px;
+  max-width: 16ch;
+  opacity: 0;
+}
+
+.creed__hair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 240vmax;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.22;
+  transform: translate(-50%, -50%) rotate(-62deg);
+}
+
+.creed__horizon {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(50% 0 0 0);
+}
+
+.creed__block {
+  position: absolute;
+  top: 50%;
+  right: 38%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-family: var(--serif);
+  font-size: min(12.5vw, 19svh);
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+  transform: translateY(52svh);
+  will-change: transform;
+}
+
+.creed__block span:nth-child(2) {
+  margin-right: -0.9em;
+}
+
+.creed__block span:nth-child(3) {
+  margin-right: 0.35em;
+}
+
+/* The 3D scene takes over the dark half; see creed-scene.ts. */
+.creed__gl {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  visibility: hidden;
+}
+
+/* The walkthrough's own shade and title, brought up as the dive lands on its first frame. */
+.creed__shade {
+  position: absolute;
+  inset: 55% 0 0;
+  background: linear-gradient(transparent, rgb(11 10 13 / 0.55));
+  opacity: 0;
+  pointer-events: none;
+}
+
+.reel__label.creed__label {
+  opacity: 0;
+}
+
+.creed__dark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  color: var(--snow);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-family: var(--serif);
+  font-size: min(13vw, 20svh);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+  transform: translate(-46%, -50%);
+}
+
+.creed__dark .creed__mask:nth-child(2) {
+  margin-left: 1.7em;
+  font-style: italic;
+}
+
+.creed__dark .creed__mask:nth-child(3) {
+  margin-left: 0.55em;
+}
+
+.creed__mask {
+  display: block;
+  overflow: hidden;
+  padding: 0 0.08em 0.1em;
+}
+
+.creed__mask > span {
+  display: block;
+  transform: translateY(105%);
+  will-change: transform;
+}
+
+.creed__line {
+  position: absolute;
+  inset: auto var(--gutter) 9svh;
+  margin-inline: auto;
+  max-width: 30ch;
+  text-align: center;
+  font-size: 15px;
+  color: rgb(251 251 251 / 0.7);
+  text-wrap: balance;
+  opacity: 0;
+}
+
 /* The walkthrough grows from a speck in the dark until it fills the screen. */
 
 .reel {
   position: relative;
   z-index: 1;
-  margin-top: -14svh;
-  border-radius: 50% 50% 0 0 / 14svh 14svh 0 0;
   overflow: clip;
   height: 430svh;
   background: var(--void);
@@ -528,7 +702,6 @@ body:has(.loader) .header {
 .reel__frame {
   position: absolute;
   inset: 0;
-  clip-path: inset(50% 50%);
   overflow: hidden;
 }
 
@@ -546,11 +719,16 @@ body:has(.loader) .header {
 }
 
 .reel__label {
+  opacity: calc(1 - var(--shut, 0) * 3);
   position: absolute;
   inset: calc(var(--header) + 4px) 0 auto;
   text-align: center;
   font-size: 14px;
   color: rgb(251 251 251 / 0.6);
+}
+
+.reel__captions {
+  opacity: calc(1 - var(--shut, 0) * 3);
 }
 
 .reel__captions p {
@@ -573,75 +751,107 @@ body:has(.loader) .header {
   transform: none;
 }
 
-/* Selected projects. The section rises over the film on a curve. */
+/* Selected projects, as Santal shows its works: the film has closed to a hairline, and out of the
+   dark a wall of his pictures rises in three columns, the middle one first. */
 
-.work {
+.works {
   position: relative;
-  z-index: 2;
-  margin-top: -14svh;
-  padding: 20svh var(--gutter) 0;
-  background: var(--snow);
-  border-radius: 50% 50% 0 0 / 14svh 14svh 0 0;
+  padding: 26svh 6px 6px;
+  background: var(--void);
+  color: var(--snow);
 }
 
-.work__title {
-  font-size: clamp(52px, 6.4vw, 104px);
-  margin-bottom: clamp(32px, 4vw, 64px);
+.works__label {
+  position: sticky;
+  top: calc(var(--header) + 4px);
+  margin: -26svh 0 calc(26svh - 1.45em);
+  opacity: var(--label, 0);
+  text-align: center;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: rgb(251 251 251 / 0.7);
 }
 
-.work__grid {
+.works__cols {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: clamp(48px, 5vw, 80px) var(--gutter);
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  align-items: start;
 }
 
-.tile__image {
+.works__col {
+  display: grid;
+  gap: 6px;
+  will-change: transform;
+}
+
+.shot {
   position: relative;
-  aspect-ratio: 16 / 11;
+  display: block;
   overflow: hidden;
-  background: var(--mist);
+  background: #1d1c21;
 }
 
-.tile__image img {
-  object-fit: cover;
+.shot img {
+  width: 100%;
+  height: auto;
   transition: transform 1.4s var(--out);
 }
 
-.tile:hover .tile__image img {
-  transform: scale(1.035);
+.shot:hover img {
+  transform: scale(1.03);
 }
 
-.tile--paper .tile__image img {
-  object-fit: contain;
-  padding: 7%;
+.shot[data-paper="true"] {
+  background: var(--mist);
+}
+
+.shot[data-paper="true"] img {
+  padding: 8%;
   mix-blend-mode: multiply;
 }
 
-.tile__meta {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  gap: var(--gutter);
-  align-items: baseline;
-  margin-top: 14px;
+.shot__name {
+  position: absolute;
+  left: 12px;
+  bottom: 10px;
   font-size: 14px;
-  color: var(--dusty);
+  color: var(--snow);
+  text-shadow: 0 1px 12px rgb(0 0 0 / 0.5);
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 0.4s,
+    transform 0.6s var(--out);
 }
 
-.tile__name {
-  font-size: clamp(24px, 2vw, 30px);
+.shot[data-paper="true"] .shot__name {
   color: var(--void);
-  transition: color 0.3s;
+  text-shadow: none;
 }
 
-.tile:hover .tile__name {
-  color: var(--lava);
+.shot:hover .shot__name,
+.shot:focus-visible .shot__name {
+  opacity: 1;
+  transform: none;
 }
 
-/* How he works: the step in view is dark, the rest wait in grey. */
+@media (hover: none) {
+  .shot__name {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* How he works, on one project. Each drawing fills the screen, laid straight onto the paper with
+   no frame. The next one sweeps in over it, so its lines turn into the next lines, and the render at
+   the end arrives as a grey wash that develops into the real room. */
 
 .steps {
   position: relative;
-  height: 340svh;
+  height: 520svh;
   margin-top: clamp(120px, 14vw, 220px);
 }
 
@@ -649,29 +859,144 @@ body:has(.loader) .header {
   position: sticky;
   top: 0;
   height: 100svh;
-  padding: calc(var(--header) + 3svh) var(--gutter) 5svh;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: auto 1fr;
-  gap: var(--gutter);
+  overflow: hidden;
+  background: var(--snow);
+  isolation: isolate;
+  perspective: 1600px;
+  perspective-origin: 50% 62%;
 }
 
-.steps__label {
-  grid-column: 1 / -1;
-  font-size: 14px;
-  color: var(--dusty);
+/* The plan lies down from its bottom edge; the facade stands up from its own. */
+.steps__layer {
+  transform-origin: 50% 100%;
+}
+
+.steps__layer[data-look="real"] {
+  -webkit-mask-image: none;
+  mask-image: none;
+  visibility: hidden;
+}
+
+.steps__lines {
+  mix-blend-mode: multiply;
+  object-fit: cover;
+}
+
+.steps__wash {
+  opacity: 0;
+}
+
+.steps__layer {
+  position: absolute;
+  inset: 0;
+  --m: 1;
+  -webkit-mask-image: linear-gradient(110deg, #000 calc(var(--m) * 140% - 40%), transparent calc(var(--m) * 140%));
+  mask-image: linear-gradient(110deg, #000 calc(var(--m) * 140% - 40%), transparent calc(var(--m) * 140%));
+  will-change: transform, opacity;
+}
+
+.steps__layer img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Drawings sit on the page itself: multiplied onto the paper, their edges dissolving into it. */
+.steps__layer[data-look="line"] img,
+.steps__layer[data-look="pencil"] img {
+  mix-blend-mode: multiply;
+  -webkit-mask-image: radial-gradient(closest-side, #000 72%, transparent);
+  mask-image: radial-gradient(closest-side, #000 72%, transparent);
+}
+
+.steps__layer[data-look="line"] img {
+  object-fit: contain;
+  padding: calc(var(--header) + 2svh) 4vw 4svh;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+/* The pencil studies are photos of grey paper: lift the paper to white so only the graphite stays. */
+.steps__layer[data-look="pencil"] img {
+  object-fit: cover;
+  object-position: 50% 45%;
+  filter: grayscale(1) brightness(1.45) contrast(3);
+  -webkit-mask-image: radial-gradient(closest-side, #000 55%, transparent);
+  mask-image: radial-gradient(closest-side, #000 55%, transparent);
+}
+
+.steps__layer[data-look="real"] img {
+  object-fit: cover;
+}
+
+.steps__wash {
+  mix-blend-mode: multiply;
+  filter: grayscale(1) contrast(0.85) brightness(1.35);
+}
+
+.steps__real {
+  opacity: 0;
+}
+
+.steps__shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgb(11 10 13 / 0.55), transparent 55%),
+    linear-gradient(transparent 55%, rgb(11 10 13 / 0.5));
+  opacity: 0;
+  transition: opacity 0.8s;
+  pointer-events: none;
+}
+
+.steps__title,
+.steps__list,
+.steps__line {
+  position: absolute;
+  z-index: 1;
+  transition: color 0.6s;
+}
+
+/* The title: centred at the top, rising in word by word as the section arrives. */
+.steps__title {
+  top: calc(var(--header) + 3svh);
+  inset-inline: var(--gutter);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: 0.24em;
+  font-family: var(--serif);
+  font-size: clamp(34px, 4.2vw, 72px);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--void);
+  --in: 0;
+}
+
+.steps__word {
+  display: inline-block;
+  overflow: hidden;
+  padding-bottom: 0.1em;
+}
+
+.steps__word > span {
+  display: inline-block;
+  transform: translateY(calc((1 - clamp(0, var(--in) * 2.2 - var(--i) * 0.2, 1)) * 108%));
 }
 
 .steps__list {
-  grid-column: 1 / 3;
-  align-self: end;
-  font-size: clamp(60px, 8.2vw, 136px);
+  left: var(--gutter);
+  bottom: 5svh;
+  font-family: var(--serif);
+  font-size: clamp(56px, 7.4vw, 124px);
   line-height: 0.96;
   letter-spacing: -0.03em;
 }
 
 .steps__list li {
-  color: var(--faint);
+  color: rgb(21 20 25 / 0.16);
   transition: color 0.6s;
 }
 
@@ -679,125 +1004,458 @@ body:has(.loader) .header {
   color: var(--void);
 }
 
-.steps__card {
-  grid-column: 3 / -1;
-  align-self: end;
-  display: grid;
-  gap: 18px;
-}
-
-.steps__images {
-  position: relative;
-  aspect-ratio: 4 / 3;
-  background: var(--mist);
-  overflow: hidden;
-}
-
-.steps__images img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  transform: scale(1.04);
-  transition:
-    opacity 0.8s,
-    transform 1.6s var(--out);
-}
-
-.steps__images img[data-paper="true"] {
-  object-fit: contain;
-  padding: 6%;
-  mix-blend-mode: multiply;
-}
-
-.steps__images img[data-on="true"] {
-  opacity: 1;
-  transform: none;
-}
-
 .steps__line {
-  max-width: 40ch;
-  min-height: 3em;
+  right: var(--gutter);
+  bottom: 5svh;
+  max-width: 34ch;
   font-size: 15px;
+  color: var(--void);
 }
 
-/* About, in his words */
+/* Over the render the words turn white. */
+.steps__pin[data-dark="true"] .steps__shade {
+  opacity: 1;
+}
+
+.steps__pin[data-dark="true"] .steps__title {
+  color: var(--snow);
+}
+
+.steps__pin[data-dark="true"] .steps__list li {
+  color: rgb(251 251 251 / 0.3);
+}
+
+.steps__pin[data-dark="true"] .steps__list li[data-on="true"],
+.steps__pin[data-dark="true"] .steps__line {
+  color: var(--snow);
+}
+
+/* About, in his words. The lead inks in word by word as you read; below it, a sketchbook page
+   sits straight on the paper beside his stance and a short index. */
 
 .about {
   padding: clamp(140px, 18vw, 260px) var(--gutter) 0;
 }
 
+.about__eyebrow {
+  margin-bottom: clamp(20px, 2.4vw, 36px);
+  font-size: 14px;
+  color: var(--dusty);
+}
+
 .about__lead {
-  font-size: clamp(34px, 4.3vw, 72px);
+  max-width: 22em;
+  font-family: var(--serif);
+  font-size: clamp(36px, 4.6vw, 80px);
   line-height: 1.04;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.02em;
   text-wrap: pretty;
 }
 
-.about__row {
+.about__lead span {
+  --ink: 0;
+  color: color-mix(in srgb, var(--void) calc(var(--ink) * 100%), var(--faint));
+}
+
+.about__body {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(12, 1fr);
   gap: var(--gutter);
-  margin-top: clamp(64px, 8vw, 128px);
+  margin-top: clamp(80px, 10vw, 170px);
   align-items: start;
 }
 
-.about__picture {
-  grid-column: 2;
+/* The page is multiplied onto the paper, its grey lifted to white, so only the pencil shows. */
+.about__page {
+  grid-column: 1 / 7;
 }
 
-.about__picture img {
+.about__page > div {
+  will-change: transform;
+}
+
+.about__page img {
   width: 100%;
-  aspect-ratio: 4 / 5;
-  object-fit: cover;
-  filter: grayscale(1) contrast(1.05);
+  mix-blend-mode: multiply;
+  filter: grayscale(1) brightness(1.75) contrast(2.8);
+  -webkit-mask-image: radial-gradient(closest-side, #000 62%, transparent);
+  mask-image: radial-gradient(closest-side, #000 62%, transparent);
 }
 
-.about__text {
-  grid-column: 3;
+.about__page[data-portrait="true"] img {
+  mix-blend-mode: normal;
+  filter: grayscale(1) contrast(1.05);
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+.about__page figcaption {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--dusty);
+}
+
+.about__side {
+  grid-column: 8 / -1;
   display: grid;
-  gap: 14px;
-  font-size: 14px;
-  max-width: 40ch;
+  gap: clamp(36px, 4vw, 64px);
+  padding-top: clamp(16px, 3vw, 56px);
 }
 
 .about__stance {
+  margin: 0;
   font-family: var(--serif);
-  font-size: clamp(22px, 1.8vw, 27px);
-  line-height: 1.15;
-  margin-bottom: 8px;
+  font-style: italic;
+  font-size: clamp(26px, 2.4vw, 40px);
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  text-wrap: pretty;
 }
 
-.about__text .talk {
-  margin-top: 16px;
-}
-
-.cv {
+.about__index > div {
   display: grid;
-  gap: 10px;
-  margin-top: clamp(96px, 11vw, 168px);
+  grid-template-columns: 9.5em 1fr;
+  gap: var(--gutter);
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
   font-size: 14px;
 }
 
-.cv > div {
+.about__index > div:last-child {
+  border-bottom: 1px solid var(--line);
+}
+
+.about__index dt {
+  color: var(--dusty);
+}
+
+.about__side .talk {
+  max-width: 22em;
+  font-size: 15px;
+}
+
+/* His CV as a road, read like a page: a Z through every row, drawn as you scroll, each stop
+   coming up as the road reaches it. Positions are set by Journey.tsx. */
+
+.journey {
+  position: relative;
+  margin-top: clamp(120px, 14vw, 220px);
+  height: 340svh;
+}
+
+.journey__pin {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+
+.journey__title {
+  position: absolute;
+  top: calc(var(--header) + 3svh);
+  left: var(--gutter);
+  font-family: var(--serif);
+  font-size: clamp(44px, 5.4vw, 96px);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
+.journey__road {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.journey__road path {
+  fill: none;
+  stroke: var(--void);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+
+.journey__road circle {
+  fill: var(--lava);
+}
+
+.stop {
+  --in: 0;
+  position: absolute;
+  width: min(42vw, 520px);
+}
+
+.stop__when {
+  position: absolute;
+  bottom: 14px;
+  left: 0;
+  overflow: hidden;
+  padding-bottom: 0.06em;
+  font-family: var(--serif);
+  font-size: clamp(52px, 6.2vw, 112px);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+}
+
+.stop[data-loose="true"] .stop__when {
+  font-size: clamp(28px, 2.8vw, 46px);
+  font-style: italic;
+}
+
+/* The words knock the road out behind them, so the diagonals pass cleanly underneath. */
+.stop__when > span,
+.stop__what,
+.stop__where {
+  background: var(--snow);
+  box-shadow: 0 0 0 4px var(--snow);
+}
+
+.stop__what,
+.stop__where {
+  width: fit-content;
+}
+
+.stop__when > span {
+  display: block;
+  transform: translateY(calc((1 - var(--in)) * 105%));
+}
+
+.stop__dot {
+  position: absolute;
+  top: -4.5px;
+  left: -4.5px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--void);
+  transform: scale(var(--in));
+}
+
+.stop__what,
+.stop__where {
+  position: absolute;
+  left: 0;
+  right: 0;
+  opacity: var(--in);
+  transform: translateY(calc((1 - var(--in)) * 12px));
+}
+
+.stop__what {
+  top: 16px;
+  font-family: var(--serif);
+  font-size: clamp(21px, 1.8vw, 28px);
+  line-height: 1.1;
+}
+
+.stop__where {
+  top: calc(16px + 2.1em);
+  font-size: 14px;
+  color: var(--dusty);
+}
+
+.journey__next {
+  --in: 0;
+  position: absolute;
+  bottom: auto;
+  display: flex;
+  gap: 24px;
+  padding-bottom: 8px;
+  font-size: 15px;
+  white-space: nowrap;
+  opacity: var(--in);
+  transform: translate(-100%, calc(-100% - 14px));
+  background: linear-gradient(currentColor, currentColor) left bottom / 100% 1px no-repeat;
+}
+
+.journey__next:hover {
+  color: var(--lava);
+}
+
+/* Who he'd love to design for: a list to tick, beside a list of who it isn't for. */
+
+.fit {
+  padding: clamp(140px, 16vw, 240px) var(--gutter) 0;
+}
+
+.fit__title {
+  margin-bottom: clamp(40px, 5vw, 80px);
+  text-align: center;
+  font-family: var(--serif);
+  font-size: clamp(44px, 5.6vw, 100px);
+  font-weight: 400;
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.fit__panels {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--gutter);
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(16px, 2vw, 32px);
+  max-width: 1500px;
+  margin-inline: auto;
 }
 
-.cv dt {
+.fit__panel {
+  margin: 0;
+  min-width: 0;
+  padding: clamp(24px, 3vw, 48px);
+  border: 0;
+  background: var(--mist);
+}
+
+.fit__panel--yes {
+  border-top: 2px solid var(--lava);
+}
+
+.fit__panel--no {
+  background: #e6e5e0;
+}
+
+.fit__label {
+  float: left;
+  width: 100%;
+  margin-bottom: 18px;
+  padding: 0;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.fit__panel--no .fit__label {
   color: var(--dusty);
 }
 
-.cv dd:not(.cv__when) {
-  grid-column: 2 / 4;
+.fit ul {
+  clear: both;
 }
 
-.cv__when {
-  text-align: right;
+.fit li {
+  border-top: 1px solid var(--line);
+  font-size: clamp(15px, 1.15vw, 18px);
+  line-height: 1.35;
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.7s calc(var(--i) * 70ms + 0.15s),
+    transform 0.9s var(--out) calc(var(--i) * 70ms + 0.15s);
+}
+
+.fit__panel--no li {
+  padding: 18px 0;
+  color: rgb(21 20 25 / 0.72);
+}
+
+.fit[data-in="true"] li {
+  opacity: 1;
+  transform: none;
+}
+
+.fit label {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 0;
+  cursor: pointer;
+}
+
+.fit input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.fit__box {
+  position: relative;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border: 1px solid rgb(21 20 25 / 0.45);
+  transition:
+    background 0.25s,
+    border-color 0.25s;
+}
+
+.fit__box::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 6px;
+  height: 11px;
+  border: solid var(--snow);
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg) scale(0);
+  transition: transform 0.3s var(--out);
+}
+
+.fit input:checked + .fit__box {
+  background: var(--void);
+  border-color: var(--void);
+}
+
+.fit input:checked + .fit__box::after {
+  transform: rotate(45deg) scale(1);
+}
+
+.fit input:focus-visible + .fit__box {
+  outline: 2px solid var(--lava);
+  outline-offset: 3px;
+}
+
+.fit label:hover .fit__box {
+  border-color: var(--void);
+}
+
+.fit__count {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0 4px;
+  padding-top: 18px;
+  border-top: 1px solid var(--void);
+}
+
+.fit__n,
+.fit__of {
+  font-family: var(--serif);
+  font-size: clamp(44px, 4vw, 64px);
+  line-height: 1;
+}
+
+.fit__of {
   color: var(--dusty);
+  margin-right: 14px;
+}
+
+.fit__prompt,
+.fit__match {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dusty);
+}
+
+.fit__match {
+  color: var(--lava);
+}
+
+/* Back to the top, from the footer. */
+.top {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--void);
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.top:hover {
+  color: var(--lava);
 }
 
 /* Footer */
@@ -1099,9 +1757,26 @@ body:has(.loader) .header {
     transform: none;
   }
 
-  .reel {
-    margin-top: -6svh;
-    border-radius: 50% 50% 0 0 / 6svh 6svh 0 0;
+  .creed__eyebrow {
+    left: var(--gutter);
+  }
+
+  .creed__block {
+    right: 14%;
+    font-size: 16vw;
+  }
+
+  .creed__block span:nth-child(2) {
+    margin-right: -0.3em;
+  }
+
+  .creed__dark {
+    font-size: 19vw;
+    transform: translate(-50%, -50%);
+  }
+
+  .creed__dark .creed__mask:nth-child(2) {
+    margin-left: 1.1em;
   }
 
   .stage__name {
@@ -1127,63 +1802,74 @@ body:has(.loader) .header {
     grid-column: 1;
   }
 
-  .work {
-    border-radius: 50% 50% 0 0 / 6svh 6svh 0 0;
-    margin-top: -6svh;
-    padding-top: 12svh;
+  .works,
+  .works__cols,
+  .works__col {
+    gap: 4px;
   }
 
-  .work__grid {
-    grid-template-columns: 1fr;
-  }
-
-  .tile__meta {
-    grid-template-columns: 1fr auto auto;
-  }
-
-  .steps {
-    height: 320svh;
-  }
-
-  .steps__pin {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto 1fr;
-  }
-
+  /* On a phone the names sit up top, clear of the drawings. */
   .steps__list {
-    grid-column: 1;
-    align-self: start;
-    font-size: 15vw;
+    top: calc(var(--header) + 3svh + 2.6em);
+    bottom: auto;
+    font-size: 10vw;
   }
 
-  .steps__card {
-    grid-column: 1;
+  .steps__title {
+    justify-content: flex-start;
+    font-size: 8vw;
   }
 
-  .about__row {
-    grid-template-columns: 1fr 1fr;
+  .steps__line {
+    left: var(--gutter);
+    right: var(--gutter);
   }
 
-  .about__picture {
-    grid-column: 1;
+  .steps__layer[data-look="line"] img {
+    padding-inline: 2vw;
   }
 
-  .about__text {
+  .stop {
+    width: 88vw;
+  }
+
+  .stop__when {
+    bottom: 8px;
+    font-size: 30px;
+  }
+
+  .stop[data-loose="true"] .stop__when {
+    font-size: 22px;
+  }
+
+  .stop__what {
+    top: 9px;
+    font-size: 18px;
+  }
+
+  .stop__where {
+    top: calc(9px + 1.85em);
+    font-size: 13px;
+  }
+
+  .fit__panels {
+    grid-template-columns: 1fr;
+  }
+
+  .footer__base {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .about__page,
+  .about__side {
     grid-column: 1 / -1;
-    margin-top: 24px;
   }
 
-  .cv > div {
-    grid-template-columns: 1fr auto;
-    gap: 2px 16px;
-  }
-
-  .cv dt {
-    grid-column: 1 / -1;
-  }
-
-  .cv dd:not(.cv__when) {
-    grid-column: 1;
+  .about__index > div {
+    grid-template-columns: 1fr;
+    gap: 4px;
   }
 
   .project__text {

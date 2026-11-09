@@ -1,4 +1,5 @@
 import { site } from "@/content/site";
+import { BackToTop } from "./BackToTop";
 
 export function Footer() {
   return (
@@ -18,6 +19,7 @@ export function Footer() {
       </div>
       <div className="footer__base">
         <span>{site.fullName}</span>
+        <BackToTop />
         <span>
           {site.role}, {site.location}
         </span>
