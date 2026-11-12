@@ -6,7 +6,6 @@ import { useEffect, useRef, useState } from "react";
 import { film, filmFrames, process, projects, ringCards, site, sketches, work } from "@/content/site";
 import { Creed } from "./Creed";
 import { About } from "./About";
-import { Fit } from "./Fit";
 import { Footer } from "./Footer";
 import { Journey } from "./Journey";
 import { Loader } from "./Loader";
@@ -374,6 +373,8 @@ export function Experience() {
         </div>
       </section>
 
+      <About />
+
       <Creed />
 
       <section className="reel" ref={reel} aria-label="Shararat, a walkthrough">
@@ -461,11 +462,7 @@ export function Experience() {
         </div>
       </section>
 
-      <About />
-
       <Journey />
-
-      <Fit />
 
       <Footer />
     </>

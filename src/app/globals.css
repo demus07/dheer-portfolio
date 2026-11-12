@@ -13,6 +13,7 @@
   --header: 56px;
   --out: cubic-bezier(0.2, 0.7, 0.1, 1);
   --curtain: cubic-bezier(0.76, 0, 0.24, 1);
+  --z-cursor: 100;
 
   --serif: var(--font-serif), Georgia, serif;
   --sans: var(--font-sans), system-ui, sans-serif;
@@ -42,6 +43,67 @@ body {
   line-height: 1.45;
   -webkit-font-smoothing: antialiased;
   overflow-x: clip;
+}
+
+/* The custom pointer is enabled only after its client-side behavior is ready. */
+html[data-custom-cursor="true"],
+html[data-custom-cursor="true"] * {
+  cursor: none !important;
+}
+
+.custom-cursor {
+  --cursor-x: -100px;
+  --cursor-y: -100px;
+  position: fixed;
+  z-index: var(--z-cursor);
+  top: 0;
+  left: 0;
+  width: 38px;
+  height: 38px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(calc(var(--cursor-x) - 6px), calc(var(--cursor-y) - 5px), 0);
+  transition: opacity 120ms;
+}
+
+.custom-cursor::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgb(245 110 15 / 0.42);
+  border-radius: 50%;
+  background: rgb(245 110 15 / 0.05);
+  opacity: 0;
+  transform: scale(0.78);
+  transition:
+    opacity 180ms var(--out),
+    transform 220ms var(--out);
+}
+
+.custom-cursor[data-visible="true"] {
+  opacity: 1;
+}
+
+.custom-cursor[data-interactive="true"]::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.custom-cursor__arrow {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 23px;
+  height: 25px;
+  overflow: visible;
+  fill: var(--lava);
+  filter: drop-shadow(0 1px 1px rgb(21 20 25 / 0.18));
+}
+
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .custom-cursor {
+    display: none;
+  }
 }
 
 h1,
@@ -1134,313 +1196,251 @@ body:has(.loader) .header {
   font-size: 15px;
 }
 
-/* His CV as a road, read like a page: a Z through every row, drawn as you scroll, each stop
-   coming up as the road reaches it. Positions are set by Journey.tsx. */
+/* His CV as a vertical ledger: the title owns the left-side air while a progress rail makes the
+   chronology explicit. Journey.tsx sets the rail length and scroll progress. */
 
 .journey {
-  position: relative;
-  margin-top: clamp(120px, 14vw, 220px);
-  height: 340svh;
+  margin-top: clamp(140px, 16vw, 260px);
+  padding: 0 var(--gutter) clamp(120px, 12vw, 200px);
 }
 
-.journey__pin {
+.journey__layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.72fr) minmax(0, 1.28fr);
+  gap: clamp(72px, 9vw, 176px);
+  width: min(100%, 1560px);
+  margin-inline: auto;
+  align-items: start;
+}
+
+.journey__intro {
   position: sticky;
-  top: 0;
-  height: 100svh;
-  overflow: hidden;
+  top: calc(var(--header) + 8svh);
+  padding-bottom: 12svh;
 }
 
 .journey__title {
-  position: absolute;
-  top: calc(var(--header) + 3svh);
-  left: var(--gutter);
+  max-width: 6.5ch;
   font-family: var(--serif);
-  font-size: clamp(44px, 5.4vw, 96px);
+  font-size: clamp(72px, 8vw, 138px);
   font-weight: 400;
-  line-height: 0.95;
-  letter-spacing: -0.03em;
-}
-
-.journey__road {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.journey__road path {
-  fill: none;
-  stroke: var(--void);
-  stroke-width: 1;
-  stroke-linejoin: round;
-}
-
-.journey__road circle {
-  fill: var(--lava);
-}
-
-.stop {
-  --in: 0;
-  position: absolute;
-  width: min(42vw, 520px);
-}
-
-.stop__when {
-  position: absolute;
-  bottom: 14px;
-  left: 0;
-  overflow: hidden;
-  padding-bottom: 0.06em;
-  font-family: var(--serif);
-  font-size: clamp(52px, 6.2vw, 112px);
-  line-height: 0.9;
-  letter-spacing: -0.03em;
-  white-space: nowrap;
-}
-
-.stop[data-loose="true"] .stop__when {
-  font-size: clamp(28px, 2.8vw, 46px);
-  font-style: italic;
-}
-
-/* The words knock the road out behind them, so the diagonals pass cleanly underneath. */
-.stop__when > span,
-.stop__what,
-.stop__where {
-  background: var(--snow);
-  box-shadow: 0 0 0 4px var(--snow);
-}
-
-.stop__what,
-.stop__where {
-  width: fit-content;
-}
-
-.stop__when > span {
-  display: block;
-  transform: translateY(calc((1 - var(--in)) * 105%));
-}
-
-.stop__dot {
-  position: absolute;
-  top: -4.5px;
-  left: -4.5px;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--void);
-  transform: scale(var(--in));
-}
-
-.stop__what,
-.stop__where {
-  position: absolute;
-  left: 0;
-  right: 0;
-  opacity: var(--in);
-  transform: translateY(calc((1 - var(--in)) * 12px));
-}
-
-.stop__what {
-  top: 16px;
-  font-family: var(--serif);
-  font-size: clamp(21px, 1.8vw, 28px);
-  line-height: 1.1;
-}
-
-.stop__where {
-  top: calc(16px + 2.1em);
-  font-size: 14px;
-  color: var(--dusty);
-}
-
-.journey__next {
-  --in: 0;
-  position: absolute;
-  bottom: auto;
-  display: flex;
-  gap: 24px;
-  padding-bottom: 8px;
-  font-size: 15px;
-  white-space: nowrap;
-  opacity: var(--in);
-  transform: translate(-100%, calc(-100% - 14px));
-  background: linear-gradient(currentColor, currentColor) left bottom / 100% 1px no-repeat;
-}
-
-.journey__next:hover {
-  color: var(--lava);
-}
-
-/* Who he'd love to design for: a list to tick, beside a list of who it isn't for. */
-
-.fit {
-  padding: clamp(140px, 16vw, 240px) var(--gutter) 0;
-}
-
-.fit__title {
-  margin-bottom: clamp(40px, 5vw, 80px);
-  text-align: center;
-  font-family: var(--serif);
-  font-size: clamp(44px, 5.6vw, 100px);
-  font-weight: 400;
-  line-height: 0.98;
-  letter-spacing: -0.03em;
+  line-height: 0.86;
+  letter-spacing: -0.035em;
   text-wrap: balance;
 }
 
-.fit__panels {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(16px, 2vw, 32px);
-  max-width: 1500px;
-  margin-inline: auto;
-}
-
-.fit__panel {
-  margin: 0;
-  min-width: 0;
-  padding: clamp(24px, 3vw, 48px);
-  border: 0;
-  background: var(--mist);
-}
-
-.fit__panel--yes {
-  border-top: 2px solid var(--lava);
-}
-
-.fit__panel--no {
-  background: #e6e5e0;
-}
-
-.fit__label {
-  float: left;
-  width: 100%;
-  margin-bottom: 18px;
-  padding: 0;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.fit__panel--no .fit__label {
-  color: var(--dusty);
-}
-
-.fit ul {
-  clear: both;
-}
-
-.fit li {
-  border-top: 1px solid var(--line);
-  font-size: clamp(15px, 1.15vw, 18px);
-  line-height: 1.35;
-  opacity: 0;
-  transform: translateY(10px);
-  transition:
-    opacity 0.7s calc(var(--i) * 70ms + 0.15s),
-    transform 0.9s var(--out) calc(var(--i) * 70ms + 0.15s);
-}
-
-.fit__panel--no li {
-  padding: 18px 0;
-  color: rgb(21 20 25 / 0.72);
-}
-
-.fit[data-in="true"] li {
-  opacity: 1;
-  transform: none;
-}
-
-.fit label {
+.journey__range {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 18px 0;
+  margin-top: clamp(28px, 4vw, 56px);
+  font-family: var(--serif);
+  font-size: clamp(18px, 1.6vw, 24px);
+  font-style: italic;
+  color: var(--dusty);
+}
+
+.journey__range::before {
+  content: "";
+  width: clamp(40px, 5vw, 80px);
+  height: 1px;
+  background: var(--line);
+}
+
+.journey__timeline {
+  --progress: 1;
+  --year-column: clamp(132px, 10vw, 184px);
+  --marker-column: 28px;
+  --marker-half: 14px;
+  --ledger-gap: clamp(24px, 3.4vw, 56px);
+  --rail-start: 0px;
+  --rail-length: 100%;
+  position: relative;
+}
+
+.journey__timeline::before,
+.journey__timeline::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: var(--rail-start);
+  left: calc(var(--year-column) + var(--ledger-gap) + var(--marker-half) - 0.5px);
+  width: 1px;
+  height: var(--rail-length);
+  transform-origin: top;
+}
+
+.journey__timeline::before {
+  background: var(--line);
+}
+
+.journey__timeline::after {
+  background: var(--lava);
+  transform: scaleY(var(--progress));
+}
+
+.journey__item {
+  --in: 1;
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: var(--year-column) var(--marker-column) minmax(0, 1fr);
+  column-gap: var(--ledger-gap);
+  min-height: clamp(164px, 15vw, 224px);
+}
+
+.journey__item:last-child {
+  min-height: 0;
+}
+
+.journey__when {
+  align-self: start;
+  font-family: var(--serif);
+  font-size: clamp(52px, 5.2vw, 84px);
+  line-height: 0.9;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+  opacity: var(--in);
+  transform: translate3d(0, calc((1 - var(--in)) * 22px), 0);
+  transition: color 250ms var(--out);
+}
+
+.journey__item[data-loose="true"] .journey__when {
+  padding-top: 0.22em;
+  font-size: clamp(28px, 2.7vw, 44px);
+  font-style: italic;
+  letter-spacing: -0.025em;
+}
+
+.journey__marker {
+  position: relative;
+  z-index: 2;
+  place-self: start center;
+  width: 13px;
+  height: 13px;
+  margin-top: clamp(18px, 2.1vw, 30px);
+  border: 1px solid var(--void);
+  border-radius: 50%;
+  background: var(--snow);
+  transform: scale(calc(0.72 + var(--in) * 0.28));
+  transition:
+    transform 250ms var(--out),
+    border-color 250ms,
+    background 250ms,
+    box-shadow 300ms var(--out);
+}
+
+.journey__event {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  align-self: start;
+  padding-top: clamp(14px, 1.7vw, 24px);
+  border-top: 1px solid var(--line);
+  opacity: var(--in);
+  transform: translate3d(calc((1 - var(--in)) * 24px), 0, 0);
+  transition:
+    transform 300ms var(--out),
+    border-color 250ms;
+}
+
+.journey__event-title {
+  width: fit-content;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
   cursor: pointer;
 }
 
-.fit input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.fit__box {
-  position: relative;
-  flex: none;
-  width: 20px;
-  height: 20px;
-  border: 1px solid rgb(21 20 25 / 0.45);
-  transition:
-    background 0.25s,
-    border-color 0.25s;
-}
-
-.fit__box::after {
-  content: "";
-  position: absolute;
-  left: 6px;
-  top: 2px;
-  width: 6px;
-  height: 11px;
-  border: solid var(--snow);
-  border-width: 0 1.5px 1.5px 0;
-  transform: rotate(45deg) scale(0);
-  transition: transform 0.3s var(--out);
-}
-
-.fit input:checked + .fit__box {
-  background: var(--void);
-  border-color: var(--void);
-}
-
-.fit input:checked + .fit__box::after {
-  transform: rotate(45deg) scale(1);
-}
-
-.fit input:focus-visible + .fit__box {
-  outline: 2px solid var(--lava);
-  outline-offset: 3px;
-}
-
-.fit label:hover .fit__box {
-  border-color: var(--void);
-}
-
-.fit__count {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 0 4px;
-  padding-top: 18px;
-  border-top: 1px solid var(--void);
-}
-
-.fit__n,
-.fit__of {
+.journey__event-title strong {
   font-family: var(--serif);
-  font-size: clamp(44px, 4vw, 64px);
-  line-height: 1;
+  font-size: clamp(24px, 2.1vw, 34px);
+  font-weight: 400;
+  line-height: 1.05;
 }
 
-.fit__of {
-  color: var(--dusty);
-  margin-right: 14px;
-}
-
-.fit__prompt,
-.fit__match {
-  font-size: 12px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+.journey__event > span {
+  font-size: 14px;
+  line-height: 1.45;
   color: var(--dusty);
 }
 
-.fit__match {
+.journey__preview {
+  --preview-x: 50vw;
+  --preview-y: 50vh;
+  position: fixed;
+  z-index: 4;
+  top: var(--preview-y);
+  left: var(--preview-x);
+  width: clamp(230px, 21vw, 340px);
+  aspect-ratio: 4 / 3;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--void);
+  box-shadow: 0 12px 32px rgb(20 17 15 / 0.2);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: scale(0.96);
+  transform-origin: center;
+  transition:
+    opacity 220ms,
+    visibility 220ms,
+    transform 320ms var(--out);
+}
+
+.journey__preview img {
+  object-fit: cover;
+}
+
+.journey__preview[data-open="true"],
+.journey__item:has(.journey__event-title:focus-visible) > .journey__preview {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+}
+
+@media (hover: hover) {
+  .journey__item:has(.journey__event-title:hover) {
+    z-index: 5;
+  }
+
+  .journey__item:has(.journey__event-title:hover) > .journey__preview {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+  }
+}
+
+.journey__item[data-active="true"] .journey__marker,
+.journey__item:hover .journey__marker {
+  border-color: var(--lava);
+  background: var(--lava);
+  box-shadow: 0 0 0 7px rgb(245 110 15 / 0.12);
+  transform: scale(1.2);
+}
+
+.journey__item[data-active="true"] .journey__event,
+.journey__item:hover .journey__event {
+  border-color: var(--void);
+  transform: translate3d(6px, 0, 0);
+}
+
+.journey__item[data-active="true"] .journey__when,
+.journey__item:hover .journey__when {
   color: var(--lava);
+}
+
+.journey__next {
+  display: block;
+  width: fit-content;
+  margin: clamp(96px, 11vw, 172px) auto 0;
+  padding: 0 0 8px;
+  background: linear-gradient(currentColor, currentColor) left bottom / 100% 1px no-repeat;
+  font-size: 15px;
 }
 
 /* Back to the top, from the footer. */
@@ -1474,10 +1474,22 @@ body:has(.loader) .header {
 
 .footer__links {
   margin-top: clamp(20px, 2.4vw, 36px);
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.footer__social {
   display: grid;
-  gap: 6px;
-  font-family: var(--serif);
-  font-size: clamp(21px, 1.7vw, 25px);
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  color: var(--void);
+}
+
+.footer__social svg {
+  width: 26px;
+  height: 26px;
 }
 
 .footer__links a {
@@ -1488,10 +1500,9 @@ body:has(.loader) .header {
   color: var(--lava);
 }
 
-.footer__links ul {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
+.footer__links a:focus-visible {
+  outline: 2px solid var(--lava);
+  outline-offset: 4px;
 }
 
 .footer__base {
@@ -1829,31 +1840,88 @@ body:has(.loader) .header {
     padding-inline: 2vw;
   }
 
-  .stop {
-    width: 88vw;
+  .journey {
+    margin-top: clamp(112px, 24vw, 160px);
+    padding-bottom: 112px;
   }
 
-  .stop__when {
-    bottom: 8px;
-    font-size: 30px;
+  .journey__layout {
+    display: block;
   }
 
-  .stop[data-loose="true"] .stop__when {
-    font-size: 22px;
+  .journey__intro {
+    position: static;
+    padding-bottom: 72px;
   }
 
-  .stop__what {
-    top: 9px;
-    font-size: 18px;
+  .journey__title {
+    max-width: 7ch;
+    font-size: clamp(64px, 18vw, 92px);
   }
 
-  .stop__where {
-    top: calc(9px + 1.85em);
-    font-size: 13px;
+  .journey__timeline {
+    --marker-column: 22px;
+    --marker-half: 11px;
+    --ledger-gap: 20px;
   }
 
-  .fit__panels {
-    grid-template-columns: 1fr;
+  .journey__timeline::before,
+  .journey__timeline::after {
+    left: calc(var(--marker-half) - 0.5px);
+  }
+
+  .journey__item {
+    grid-template-columns: var(--marker-column) minmax(0, 1fr);
+    min-height: 178px;
+  }
+
+  .journey__when {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: 48px;
+  }
+
+  .journey__item[data-loose="true"] .journey__when {
+    padding-top: 0;
+    font-size: 28px;
+  }
+
+  .journey__marker {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    width: 12px;
+    height: 12px;
+    margin-top: 12px;
+  }
+
+  .journey__event {
+    grid-column: 2;
+    grid-row: 2;
+    margin-top: 18px;
+    padding-top: 16px;
+  }
+
+  .journey__event-title strong {
+    font-size: 24px;
+  }
+
+  .journey__item[data-preview-open="true"] {
+    z-index: 5;
+  }
+
+  .journey__preview {
+    top: 50%;
+    left: 50%;
+    width: min(76vw, 320px);
+    transform: translate(-50%, -50%) scale(0.97);
+  }
+
+  .journey__preview[data-open="true"] {
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .journey__next {
+    margin-top: 88px;
   }
 
   .footer__base {

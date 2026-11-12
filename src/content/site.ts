@@ -37,7 +37,6 @@ export const site = {
   email: "dheerchheda1@gmail.com",
   // Add a path in public/ to show a portrait in the about section.
   portrait: "",
-  socials: [] as { label: string; url: string }[],
 };
 
 // The turn after the landing. Three words on paper sink into a line, the page goes dark,
@@ -52,35 +51,6 @@ export const creed = {
   small: ["Sit", "Stay", "Linger", "Touch", "Look up", "Walk in"],
 };
 
-// Before the contact: who he'd love to design for, and who he isn't for. Drawn from what he says
-// he believes: the feeling and the people first, sketching first, and a person's own taste over a default.
-export const fit = {
-  title: "Who I’d love to design for.",
-  yes: {
-    label: "For you if you",
-    items: [
-      "Want a room that feels like the people in it.",
-      "Already have a look you love, and want it taken further.",
-      "Would rather have character than minimal by default.",
-      "Care how the light falls, not just where the sofa goes.",
-      "Like seeing it sketched before it’s drawn.",
-      "Have a story the space should tell.",
-    ],
-  },
-  no: {
-    label: "Probably not for",
-    items: [
-      "Anyone after a copy of a Pinterest board.",
-      "Rooms meant to look like every other room.",
-      "Spaces designed for a photo, not the people in them.",
-      "Projects that skip the sketching.",
-      "Anyone who wants it done without asking why.",
-    ],
-  },
-  prompt: "Tick what sounds like you.",
-  match: "Sounds like we should talk",
-};
-
 // The opening, set while the site loads. The words after the lead fall into the grid one by one.
 export const hook = {
   lead: "Every room begins",
@@ -89,7 +59,7 @@ export const hook = {
 };
 
 export const about = {
-  lead: "I’m Dheer, an interior design student from Prabhadevi. I walk into a room and watch the light: how it meets the colour, why the space was built, and how it makes me feel.",
+  lead: "Hi! I'm Dheer. I grew up in Mumbai with a pencil in hand, sketching just about everything. My parents always encouraged me to explore, experiment and follow my instincts. That freedom shaped the way I see the world today.",
   stance: "Minimal became the default. Personal taste paid for it. I design for the visual direction a person already has.",
 };
 
@@ -113,12 +83,42 @@ export const process = [
 export const journey = {
   title: "The road so far",
   stops: [
-    { when: "2023", what: "Began interior design", where: "ISDI, Atlas SkillTech University" },
-    { when: "2023", what: "Painted a mural", where: "Closed Bonet" },
-    { when: "Along the way", what: "Interned in interior design", where: "Essence of Art, and Space X" },
-    { when: "2025", what: "Designed an exhibit", where: "Freeform × IFLA" },
-    { when: "2026", what: "Spatial graphic designer", where: "Alvarez & Marsal" },
-    { when: "2027", what: "Graduating", where: "ISDI, Atlas SkillTech University" },
+    {
+      when: "2023",
+      what: "Began interior design",
+      where: "ISDI, Atlas SkillTech University",
+      image: "/work/sketchbook/page-1.webp",
+    },
+    {
+      when: "2023",
+      what: "Painted a mural",
+      where: "Closed Bonet",
+      image: "/work/maatik/facade.webp",
+    },
+    {
+      when: "Along the way",
+      what: "Interned in interior design",
+      where: "Essence of Art, and Space X",
+      image: "/work/hubtown-seasons/plan.webp",
+    },
+    {
+      when: "2025",
+      what: "Designed an exhibit",
+      where: "Freeform × IFLA",
+      image: "/work/light-of-bharat/dining.webp",
+    },
+    {
+      when: "2026",
+      what: "Spatial graphic designer",
+      where: "Alvarez & Marsal",
+      image: "/work/shararat/cowork.webp",
+    },
+    {
+      when: "2027",
+      what: "Graduating",
+      where: "ISDI, Atlas SkillTech University",
+      image: "/work/maatik/workshop.webp",
+    },
   ],
 };
 

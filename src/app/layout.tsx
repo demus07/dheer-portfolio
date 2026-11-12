@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Instrument_Sans, Instrument_Serif } from "next/font/google";
 import type { ReactNode } from "react";
+import { CustomCursor } from "@/components/CustomCursor";
 import { Header } from "@/components/Header";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { site } from "@/content/site";
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`${serif.variable} ${sans.variable}`}>
       <body>
+        <CustomCursor />
         <Header />
         <main>{children}</main>
         <SmoothScroll />
