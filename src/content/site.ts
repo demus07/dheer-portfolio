@@ -29,12 +29,16 @@ export const filmFrames = media.film as { count: number; fps: number; width: num
 export const site = {
   // Keeps the site out of search engines. Set to false at launch.
   draft: true,
+  // Keep the About section and navigation hidden until its next design pass.
+  showAbout: false,
   name: "Dheer",
   fullName: "Dheer Chheda",
   role: "Interior design student",
   location: "Mumbai",
   intro: "Intriguing, accessible, thoughtful. I start with the feeling and the people.",
   email: "dheerchheda1@gmail.com",
+  linkedin: "https://in.linkedin.com/in/dheer-chheda-25569526b",
+  instagram: "https://www.instagram.com/_dheer_chheda_/",
   // Add a path in public/ to show a portrait in the about section.
   portrait: "",
 };
@@ -69,14 +73,6 @@ export const notes = [
   { label: "How it began", text: "Interior design started as a minor in my first year. One project went well, and I stayed." },
   { label: "Who I look to", text: "Sameer Kulavoor for his forms. Sanjay Puri for sketching first. Sajid Wajid Shaikh for moving between mediums." },
   { label: "Off the board", text: "I’m a cinephile. Inglourious Basterds, Interstellar and Kung Fu Panda share a shelf." },
-];
-
-// How a project moves, shown on Maatik. Each step names an image in media.json.
-export const process = [
-  { name: "Sketch", line: "After a first round of research I sketch every idea I have. The sketches tell me where to go.", image: "sketch" },
-  { name: "Study", line: "Then I refine it and think in 3D. For Maatik, the roof came before the model.", image: "study-truss" },
-  { name: "Plan", line: "Then the CAD and the technical part. Where the wheel sits, where the café opens.", image: "plan" },
-  { name: "Render", line: "Then the renders. I go back and change any of it whenever something gives me a better answer.", image: "facade" },
 ];
 
 // His CV as a journey, in order. The internships have no dates, so they sit "along the way".

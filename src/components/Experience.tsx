@@ -3,29 +3,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { film, filmFrames, process, projects, ringCards, site, sketches, work } from "@/content/site";
+import { film, filmFrames, projects, ringCards, site, work } from "@/content/site";
 import { Creed } from "./Creed";
 import { About } from "./About";
 import { Footer } from "./Footer";
 import { Journey } from "./Journey";
 import { Loader } from "./Loader";
+import { ProcessVideo } from "./ProcessVideo";
 import { onFrame } from "@/lib/ticker";
 
 const cards = projects.flatMap((p, i) => ringCards[p.slug].map((src) => ({ src, project: i, slug: p.slug })));
 const N = cards.length;
-// How he works, on Maatik. Each drawing is laid straight onto the page; the last is the room itself.
-// "line" drawings sit whole on the paper, "pencil" photos of paper fill it, "real" is the render.
-const steps = process.map((s) =>
-  s.image === "sketch"
-    ? { ...s, src: sketches.maatik.src, alt: "Maatik, first sketch", look: "line" }
-    : {
-        ...s,
-        src: work.maatik[s.image].src,
-        alt: work.maatik[s.image].alt,
-        look: s.image === "facade" ? "real" : work.maatik[s.image].kind === "pencil" ? "pencil" : "line",
-      },
-);
-
 // The projects, as Santal shows its works: a full-bleed wall of pictures in three columns.
 // The four projects take turns down the wall. Hubtown has only drawings, so one is shown on paper.
 const shots = (() => {
@@ -63,21 +51,13 @@ export function Experience() {
   const reel = useRef<HTMLElement>(null);
   const frameBox = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const stepsRef = useRef<HTMLElement>(null);
   const worksRef = useRef<HTMLElement>(null);
   const colRefs = useRef<HTMLDivElement[]>([]);
-  const stepsPin = useRef<HTMLDivElement>(null);
-  const layers = useRef<HTMLDivElement[]>([]);
-  const realRef = useRef<HTMLImageElement>(null);
-  const washRef = useRef<HTMLImageElement>(null);
-  const linesRef = useRef<HTMLImageElement>(null);
-  const stepsTitle = useRef<HTMLHeadingElement>(null);
 
   const [loading, setLoading] = useState(true);
   const [ready, setReady] = useState(false);
   const [front, setFront] = useState(0);
   const [caption, setCaption] = useState(-1);
-  const [step, setStep] = useState(0);
 
   useEffect(() => {
     const stageEl = stage.current!;
@@ -86,7 +66,6 @@ export function Experience() {
     const reelEl = reel.current!;
     const canvas = canvasRef.current!;
     const context = canvas.getContext("2d");
-    const stepsEl = stepsRef.current!;
     const boxEl = frameBox.current!;
     const worksEl = worksRef.current!;
 
@@ -102,9 +81,6 @@ export function Experience() {
     let stageH = 0;
     let reelTop = 0;
     let reelH = 0;
-    let stepsTop = 0;
-    let stepsH = 0;
-    let decoded = false;
     let worksTop = 0;
     let worksH = 0;
     let colH: number[] = [];
@@ -114,7 +90,6 @@ export function Experience() {
     let drawn = -1;
     let shownFront = -1;
     let shownCaption = -2;
-    let shownStep = -1;
 
     // The walkthrough loads in order, a few frames at a time, once it is close.
     const frames: HTMLImageElement[] = [];
@@ -169,8 +144,6 @@ export function Experience() {
       stageH = stageEl.offsetHeight;
       reelTop = top(reelEl);
       reelH = reelEl.offsetHeight;
-      stepsTop = top(stepsEl);
-      stepsH = stepsEl.offsetHeight;
       worksTop = top(worksEl);
       worksH = worksEl.offsetHeight;
       colH = colRefs.current.map((c) => c.offsetHeight);
@@ -243,56 +216,6 @@ export function Experience() {
           const off = still ? 0 : lag[i] * vh * (1 - rise) + (Math.max(...colH) - colH[i]) * along;
           col.style.transform = `translate3d(0, ${off.toFixed(2)}px, 0)`;
         });
-      }
-
-      // How he works. Each drawing sweeps in over the last, so its lines turn into the next ones,
-      // while the last one swells and fades. The render arrives as a grey wash and develops into colour.
-      // Decode the big drawings well before they show, off the main thread, so none stalls a frame.
-      if (!decoded && y > stepsTop - vh * 3) {
-        decoded = true;
-        stepsEl.querySelectorAll("img").forEach((img) => img.decode().catch(() => {}));
-      }
-      if (y + vh > stepsTop && y < stepsTop + stepsH) {
-        // The title rises into the middle, word by word, as the section arrives.
-        stepsTitle.current!.style.setProperty("--in", span(y, stepsTop - vh * 0.85, stepsTop - vh * 0.05).toFixed(4));
-        const r = clamp((y - stepsTop) / (stepsH - vh));
-        const n = steps.length;
-        const S = r * (n - 0.4);
-        const plan = n - 2;
-        layers.current.forEach((el, i) => {
-          if (i === n - 1) return;
-          const inn = i === 0 ? 1 : ease(span(S, i - 0.5, i));
-          el.style.setProperty("--m", inn.toFixed(4));
-          if (i === plan) {
-            // The plan lies down and becomes the floor the building stands on.
-            const lie = still ? 0 : ease(span(S, n - 1.65, n - 1.2));
-            const gone = ease(span(S, n - 1.45, n - 1.1));
-            el.style.visibility = inn <= 0 || gone >= 1 ? "hidden" : "visible";
-            el.style.opacity = (1 - gone).toFixed(4);
-            el.style.transform = `translate3d(0, ${(lie * 22).toFixed(3)}svh, 0) rotateX(${(lie * 76).toFixed(3)}deg) scale(${(1.06 - 0.06 * inn).toFixed(4)})`;
-            return;
-          }
-          const out = ease(span(S, i + 0.5, i + 1));
-          el.style.visibility = inn <= 0 || out >= 1 ? "hidden" : "visible";
-          el.style.opacity = (1 - out).toFixed(4);
-          el.style.transform = still ? "none" : `scale(${(1.06 - 0.06 * inn + 0.1 * out).toFixed(4)})`;
-        });
-        // The facade stands up out of it as a pen drawing, takes on tone, then becomes the render.
-        const render = layers.current[n - 1];
-        const rise = ease(span(S, n - 1.55, n - 1.1));
-        render.style.visibility = rise <= 0 ? "hidden" : "visible";
-        render.style.transform = still ? "none" : `rotateX(${(-88 * (1 - rise)).toFixed(3)}deg)`;
-        render.style.opacity = still ? rise.toFixed(4) : "1";
-        washRef.current!.style.opacity = ease(span(S, n - 1.15, n - 0.85)).toFixed(4);
-        realRef.current!.style.opacity = ease(span(S, n - 0.95, n - 0.55)).toFixed(4);
-        linesRef.current!.style.opacity = (1 - ease(span(S, n - 0.7, n - 0.45))).toFixed(4);
-        const dark = String(S > n - 0.9);
-        if (stepsPin.current!.dataset.dark !== dark) stepsPin.current!.dataset.dark = dark;
-        const s = Math.min(n - 1, Math.floor(S + 0.3));
-        if (s !== shownStep) {
-          shownStep = s;
-          setStep(s);
-        }
       }
 
     };
@@ -373,7 +296,7 @@ export function Experience() {
         </div>
       </section>
 
-      <About />
+      {site.showAbout && <About />}
 
       <Creed />
 
@@ -419,48 +342,7 @@ export function Experience() {
         </div>
       </section>
 
-      <section className="steps" ref={stepsRef} aria-label="How I think, on one project">
-        <div className="steps__pin" ref={stepsPin} data-dark="false">
-          {steps.map((s, i) => (
-            <div
-              key={s.name}
-              className="steps__layer"
-              data-look={s.look}
-              ref={(n) => {
-                if (n) layers.current[i] = n;
-              }}
-            >
-              {s.look === "real" ? (
-                <>
-                  <img className="steps__lines" ref={linesRef} src="/steps/maatik-facade-lines.webp" alt="" decoding="async" />
-                  <img className="steps__wash" ref={washRef} src={s.src} alt="" decoding="async" />
-                  <img className="steps__real" ref={realRef} src={s.src} alt={s.alt} decoding="async" />
-                </>
-              ) : (
-                <img src={s.src} alt={s.alt} decoding="async" />
-              )}
-            </div>
-          ))}
-          <div className="steps__shade" aria-hidden />
-          <h2 className="steps__title" ref={stepsTitle}>
-            {"How I think, on one project".split(" ").map((w, i) => (
-              <span key={i} className="steps__word">
-                <span style={{ "--i": i } as React.CSSProperties}>{w}</span>
-              </span>
-            ))}
-          </h2>
-          <ol className="steps__list">
-            {steps.map((s, i) => (
-              <li key={s.name} data-on={i === step} aria-current={i === step ? "step" : undefined}>
-                {s.name}
-              </li>
-            ))}
-          </ol>
-          <p className="steps__line" aria-live="polite">
-            {steps[step].line}
-          </p>
-        </div>
-      </section>
+      <ProcessVideo />
 
       <Journey />
 

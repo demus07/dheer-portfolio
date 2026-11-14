@@ -12,7 +12,7 @@ export function Header() {
       <Clock />
       <nav className="header__nav" aria-label="Main">
         <Link href="/#work">Work</Link>
-        <Link href="/#about">About</Link>
+        {site.showAbout && <Link href="/#about">About</Link>}
         <a href="#contact">Contact</a>
       </nav>
     </header>

@@ -11,15 +11,32 @@ export function Footer() {
         <a className="footer__social" href={`mailto:${site.email}`} aria-label={`Email ${site.fullName}`}>
           <FaRegEnvelope aria-hidden="true" />
         </a>
-        <span className="footer__social" role="img" aria-label="LinkedIn link coming soon">
+        <a
+          className="footer__social"
+          href={site.linkedin}
+          target="_blank"
+          rel="noreferrer"
+          aria-label={`View ${site.fullName} on LinkedIn`}
+        >
           <FaLinkedinIn aria-hidden="true" />
-        </span>
-        <span className="footer__social" role="img" aria-label="Instagram link coming soon">
+        </a>
+        <a
+          className="footer__social"
+          href={site.instagram}
+          target="_blank"
+          rel="noreferrer"
+          aria-label={`View ${site.fullName} on Instagram`}
+        >
           <FaInstagram aria-hidden="true" />
-        </span>
+        </a>
       </div>
       <div className="footer__base">
-        <span>{site.fullName}</span>
+        <span>
+          crafted with <span className="footer__heart">♥</span> by{" "}
+          <a className="footer__credit" href="https://www.alro.one" target="_blank" rel="noreferrer">
+            alro
+          </a>
+        </span>
         <BackToTop />
         <span>
           {site.role}, {site.location}
