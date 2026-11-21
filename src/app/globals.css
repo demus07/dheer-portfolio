@@ -149,22 +149,12 @@ img {
 .about__lead,
 .project__title,
 .next__title,
-.footer__title,
-.studies__title {
+.footer__title {
   font-family: var(--serif);
   font-weight: 400;
   letter-spacing: -0.02em;
   line-height: 1;
   text-wrap: balance;
-}
-
-.about__line {
-  font-family: var(--serif);
-  font-size: clamp(22px, 2vw, 30px);
-  line-height: 1.2;
-  max-width: 24em;
-  text-wrap: pretty;
-  color: var(--dusty);
 }
 
 /* "Let's talk", with a hairline under it that runs the width of its column. */
@@ -380,8 +370,9 @@ body:has(.loader) .header {
 
 .stage {
   position: relative;
-  height: 330svh;
+  height: 430svh;
   --open: 0;
+  --exit: 0;
 }
 
 .stage__pin {
@@ -475,10 +466,6 @@ body:has(.loader) .header {
   user-select: none;
 }
 
-.card--paper img {
-  mix-blend-mode: multiply;
-}
-
 .stage__foot {
   position: absolute;
   inset: auto var(--gutter) 22px;
@@ -512,7 +499,8 @@ body:has(.loader) .header {
 .stage__work {
   position: absolute;
   inset: calc(var(--header) + 3svh) var(--gutter) 22px;
-  opacity: clamp(0, (var(--open) - 0.75) * 4, 1);
+  opacity: calc(clamp(0, (var(--open) - 0.75) * 4, 1) * (1 - var(--exit) * 1.8));
+  transform: translateY(calc(var(--exit) * -3svh));
   pointer-events: none;
 }
 
@@ -576,12 +564,18 @@ body:has(.loader) .header {
   white-space: nowrap;
 }
 
-/* 1160 screens: the last 100 overlap the walkthrough, which waits pinned underneath. */
+/* 1160 screens: the last 100 overlap the walkthrough, which waits pinned underneath. The first
+   100 lie over the landing's last screen, clear, so the ring's line hands straight over. */
 .creed {
   position: relative;
   z-index: 2;
   height: 1160svh;
   margin-bottom: -100svh;
+  pointer-events: none;
+}
+
+.stage + .creed {
+  margin-top: -100svh;
 }
 
 .creed__pin {
@@ -636,8 +630,8 @@ body:has(.loader) .header {
   width: 240vmax;
   height: 1px;
   background: currentColor;
-  opacity: 0.22;
-  transform: translate(-50%, -50%) rotate(-62deg);
+  opacity: 0;
+  transform: translate(-50%, -50%);
 }
 
 .creed__horizon {
@@ -748,7 +742,7 @@ body:has(.loader) .header {
   position: relative;
   z-index: 1;
   overflow: clip;
-  height: 430svh;
+  height: 530svh;
   background: var(--void);
   color: var(--snow);
 }
@@ -764,6 +758,7 @@ body:has(.loader) .header {
   position: absolute;
   inset: 0;
   overflow: hidden;
+  will-change: transform, opacity;
 }
 
 .reel__frame canvas {
@@ -794,7 +789,7 @@ body:has(.loader) .header {
 
 .reel__captions p {
   position: absolute;
-  inset: auto var(--gutter) 9svh;
+  inset: auto var(--gutter) calc(17svh + 20px);
   text-align: center;
   font-family: var(--serif);
   font-size: clamp(22px, 2.1vw, 32px);
@@ -812,20 +807,24 @@ body:has(.loader) .header {
   transform: none;
 }
 
-/* Selected projects, as Santal shows its works: the film has closed to a hairline, and out of the
-   dark a wall of his pictures rises in three columns, the middle one first. */
+/* Selected projects, as Santal shows its works: a wall of his pictures rises in three columns, the
+   middle one first, over the film's last screen as it dims into the dark. That first screen of the
+   section is clear, so the film shows through it. */
 
 .works {
+  --lead: 26svh;
   position: relative;
-  padding: 26svh 6px 6px;
-  background: var(--void);
+  z-index: 2;
+  margin-top: -100svh;
+  padding: var(--lead) 6px 6px;
+  background: linear-gradient(transparent 100svh, var(--void) 100svh);
   color: var(--snow);
 }
 
 .works__label {
   position: sticky;
   top: calc(var(--header) + 4px);
-  margin: -26svh 0 calc(26svh - 1.45em);
+  margin: calc(var(--lead) * -1) 0 calc(var(--lead) - 1.45em);
   opacity: var(--label, 0);
   text-align: center;
   font-family: var(--sans);
@@ -861,52 +860,73 @@ body:has(.loader) .header {
   transition: transform 1.4s var(--out);
 }
 
-.shot:hover img {
-  transform: scale(1.03);
-}
-
-.shot[data-paper="true"] {
-  background: var(--mist);
-}
-
-.shot[data-paper="true"] img {
-  padding: 8%;
-  mix-blend-mode: multiply;
+/* On hover the picture gives way to white paper, and the project's name is set on it. */
+.shot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--snow);
+  opacity: 0;
+  transition: opacity 0.6s var(--out);
 }
 
 .shot__name {
   position: absolute;
-  left: 12px;
-  bottom: 10px;
-  font-size: 14px;
-  color: var(--snow);
-  text-shadow: 0 1px 12px rgb(0 0 0 / 0.5);
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  padding: var(--gutter);
+  font-family: var(--serif);
+  font-size: clamp(32px, 3.4vw, 60px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-align: center;
+  color: var(--void);
   opacity: 0;
-  transform: translateY(4px);
+  transform: translateY(10px);
   transition:
-    opacity 0.4s,
-    transform 0.6s var(--out);
+    opacity 0.5s var(--out),
+    transform 0.8s var(--out);
 }
 
-.shot[data-paper="true"] .shot__name {
-  color: var(--void);
-  text-shadow: none;
+.shot:hover img,
+.shot:focus-visible img {
+  transform: scale(1.03);
+}
+
+.shot:hover::after,
+.shot:focus-visible::after {
+  opacity: 1;
 }
 
 .shot:hover .shot__name,
 .shot:focus-visible .shot__name {
   opacity: 1;
   transform: none;
+  transition-delay: 0.08s;
 }
 
+/* Without hover the name stays small in the corner, over the picture. */
 @media (hover: none) {
+  .shot::after {
+    display: none;
+  }
+
   .shot__name {
+    inset: auto auto 10px 12px;
+    display: block;
+    padding: 0;
+    font-family: var(--sans);
+    font-size: 14px;
+    color: var(--snow);
+    text-shadow: 0 1px 12px rgb(0 0 0 / 0.5);
     opacity: 1;
     transform: none;
   }
 }
 
-/* A frame-by-frame architectural transformation, scrubbed in either direction by scroll. */
+/* His Maatik roof, drawn from one truss to the finished workshop, scrubbed either way by scroll. */
 
 .process-video {
   margin-top: clamp(120px, 14vw, 220px);
@@ -914,7 +934,7 @@ body:has(.loader) .header {
 }
 
 .process-video__title {
-  padding: clamp(80px, 10vw, 160px) var(--gutter) clamp(56px, 7vw, 112px);
+  padding: clamp(80px, 10vw, 160px) var(--gutter) clamp(16px, 1.6vw, 24px);
   font-family: var(--serif);
   font-size: clamp(44px, 6.4vw, 108px);
   font-weight: 400;
@@ -922,6 +942,12 @@ body:has(.loader) .header {
   letter-spacing: -0.03em;
   text-align: center;
   text-wrap: balance;
+}
+
+.process-video__note {
+  padding: 0 var(--gutter) clamp(56px, 7vw, 112px);
+  text-align: center;
+  color: var(--dusty);
 }
 
 .process-video__timeline {
@@ -943,7 +969,7 @@ body:has(.loader) .header {
   width: 100vw;
   height: 100svh;
   overflow: hidden;
-  background: #fff url("/process/architectural-interior-frames/frame-000.avif") center / cover no-repeat;
+  background: #fff url("/process/maatik-roof/frame-000.avif") center / cover no-repeat;
 }
 
 .process-video__canvas {
@@ -1412,30 +1438,121 @@ body:has(.loader) .header {
   color: var(--lava);
 }
 
-/* Project */
+/* Project. Each page follows his portfolio spread by spread: the opening beside his first sketch,
+   then the site, the concept, the sketches, the plan, and the views with their sections. */
 
 .project {
   padding-top: calc(var(--header) + clamp(32px, 5vw, 72px));
-}
-
-.project__head {
-  padding-inline: var(--gutter);
   display: grid;
-  gap: 16px;
-  margin-bottom: clamp(32px, 4vw, 56px);
+  gap: clamp(112px, 13vw, 200px);
 }
 
 .project__title {
-  font-size: clamp(72px, 14vw, 232px);
+  font-size: clamp(72px, 12vw, 200px);
   line-height: 0.88;
   letter-spacing: -0.03em;
+}
+
+.project__subtitle {
+  margin-top: 14px;
+  font-family: var(--serif);
+  font-size: clamp(24px, 2.2vw, 34px);
+  line-height: 1.1;
+  color: var(--lava);
+}
+
+.project__credit {
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--dusty);
+}
+
+.opening {
+  padding-inline: var(--gutter);
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: var(--gutter);
+  align-items: center;
+}
+
+.opening__words {
+  display: grid;
+  align-content: start;
+}
+
+.opening__site {
+  margin-top: clamp(48px, 6vw, 96px);
+  display: grid;
+  gap: 8px;
+  max-width: 36ch;
+}
+
+.opening__site p {
+  color: var(--dusty);
+}
+
+.opening .facts {
+  margin-top: 28px;
+}
+
+.opening__intro {
+  margin-top: 28px;
+  display: grid;
+  gap: 14px;
+  max-width: 42ch;
+}
+
+.opening__sketch {
+  width: 100%;
+  max-height: 78svh;
+  object-fit: contain;
+}
+
+.chapter {
+  padding-inline: var(--gutter);
+  display: grid;
+  gap: clamp(32px, 4vw, 56px);
+}
+
+.chapter__title {
+  font-family: var(--serif);
+  font-size: clamp(30px, 2.8vw, 46px);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+h3.chapter__title {
+  font-size: clamp(26px, 2.2vw, 36px);
+}
+
+.words,
+.columns__item,
+.views__words {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: 14px;
+}
+
+.words p,
+.columns__item p,
+.views__words p {
+  max-width: 42ch;
+  text-wrap: pretty;
+}
+
+.words .chapter__title {
+  margin-bottom: 6px;
 }
 
 .figure {
   margin: 0;
 }
 
-.figure img {
+.figure img,
+.figure video {
   display: block;
   width: 100%;
   height: auto;
@@ -1447,127 +1564,121 @@ body:has(.loader) .header {
   color: var(--dusty);
 }
 
-.project__hero {
-  padding-inline: var(--gutter);
-}
-
-.project__paper,
-.paper {
-  background: var(--mist);
-}
-
-.project__paper img,
-.paper img {
+/* His drawings and sketches are on white paper; on the page they lose the paper. A drawing is
+   never taller than the screen, so a whole plan or elevation reads at once. */
+.figure--drawing img,
+.figure--sketch img {
   mix-blend-mode: multiply;
 }
 
-.project__paper {
-  margin-inline: var(--gutter);
-  padding: clamp(32px, 6vw, 96px);
-}
-
-.project__sketch {
-  width: 100%;
-  max-height: 72svh;
+.figure--drawing img {
+  max-height: 86svh;
   object-fit: contain;
+  object-position: left center;
 }
 
-.gallery {
-  padding-inline: var(--gutter);
-  display: grid;
-  gap: clamp(40px, 6vw, 88px);
-}
-
-.gallery__pair {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+.row {
+  display: flex;
   gap: var(--gutter);
-  align-items: start;
+  align-items: flex-start;
 }
 
-.gallery__pair .figure img {
-  aspect-ratio: 4 / 5;
-  object-fit: cover;
+.row > div {
+  flex-basis: 0;
+  min-width: 0;
 }
 
-.paper {
-  margin-top: clamp(96px, 12vw, 176px);
-  padding: clamp(72px, 9vw, 136px) var(--gutter);
+.story__words {
   display: grid;
-  gap: clamp(72px, 9vw, 136px);
-}
-
-.paper__sketch img {
-  display: block;
-  width: min(100%, 1100px);
-  max-height: 70svh;
-  margin-inline: auto;
-  object-fit: contain;
-}
-
-.paper__drawings {
-  display: grid;
-  gap: clamp(56px, 7vw, 104px);
-  width: min(100%, 1400px);
-  margin-inline: auto;
-}
-
-.studies {
-  padding: clamp(96px, 12vw, 176px) var(--gutter) 0;
-  display: grid;
-  gap: clamp(32px, 4vw, 56px);
-}
-
-.studies__title {
-  font-size: clamp(36px, 4vw, 64px);
-  line-height: 1.02;
-}
-
-.studies__grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--gutter);
-  align-items: end;
-}
-
-.studies__grid[data-count="4"] {
-  width: min(100%, 1200px);
-}
-
-.studies__grid img {
-  mix-blend-mode: multiply;
-}
-
-.project__text {
-  padding: clamp(56px, 8vw, 120px) var(--gutter);
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(var(--count, 3), minmax(0, 1fr));
   gap: 40px var(--gutter);
 }
 
+.story__words[data-count="1"] {
+  --count: 2;
+}
+
+.story__words[data-count="2"] {
+  --count: 2;
+  width: min(100%, 1000px);
+}
+
+.story__words[data-count="4"] {
+  --count: 2;
+}
+
+.story[data-tall="true"] {
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: var(--gutter);
+  align-items: center;
+}
+
+.story[data-tall="true"] .figure figcaption {
+  display: none;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(var(--count, 3), minmax(0, 1fr));
+  gap: 48px var(--gutter);
+  align-items: start;
+}
+
+.columns[data-count="2"] {
+  --count: 2;
+}
+
+.columns[data-count="4"] {
+  --count: 2;
+}
+
+.columns__item .figure {
+  margin-bottom: 10px;
+}
+
+.figure--sketch img {
+  max-height: 58svh;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.layout {
+  grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+  align-items: center;
+}
+
+.views__words {
+  grid-template-columns: repeat(2, minmax(0, 42ch));
+  column-gap: var(--gutter);
+}
+
+.views__words .chapter__title {
+  grid-column: 1 / -1;
+}
+
+.views .figure--drawing {
+  width: min(100%, 1500px);
+}
+
 .facts {
-  grid-column: span 2;
   display: grid;
   gap: 12px;
   align-content: start;
   max-width: 40ch;
 }
 
-.facts dt {
-  color: var(--dusty);
-  font-size: 13px;
+.facts div {
+  display: grid;
+  grid-template-columns: 9em 1fr;
+  gap: var(--gutter);
 }
 
-.project__story {
-  grid-column: 3 / -1;
-  display: grid;
-  gap: 16px;
-  max-width: 42ch;
-  font-size: 16px;
+.facts dt {
+  color: var(--dusty);
 }
 
 .project__epigraph {
-  margin-bottom: 16px;
+  margin-bottom: 8px;
   font-family: var(--serif);
   font-size: clamp(26px, 2.4vw, 36px);
   line-height: 1.1;
@@ -1579,7 +1690,7 @@ body:has(.loader) .header {
 .next {
   display: grid;
   gap: 8px;
-  padding: clamp(96px, 12vw, 176px) var(--gutter) 0;
+  padding: 0 var(--gutter);
   color: var(--dusty);
 }
 
@@ -1656,7 +1767,7 @@ body:has(.loader) .header {
   }
 
   .stage {
-    height: 300svh;
+    height: 400svh;
   }
 
   .loader__percent {
@@ -1714,6 +1825,15 @@ body:has(.loader) .header {
   .works__cols,
   .works__col {
     gap: 4px;
+  }
+
+  /* The phone's wall is shorter than the screen, so it starts lower to still cover the film's last screen. */
+  .works {
+    --lead: 62svh;
+  }
+
+  .process-video__frame {
+    background-size: contain;
   }
 
   .journey {
@@ -1816,22 +1936,38 @@ body:has(.loader) .header {
     gap: 4px;
   }
 
-  .project__text {
+  .opening,
+  .story[data-tall="true"],
+  .layout,
+  .story__words,
+  .views__words {
     grid-template-columns: 1fr;
   }
 
-  .facts,
-  .project__story {
-    grid-column: 1;
+  .opening__sketch {
+    order: -1;
+    max-height: 48svh;
   }
 
-  .gallery__pair,
-  .studies__grid {
-    grid-template-columns: 1fr;
+  .row {
+    flex-direction: column;
   }
 
-  .studies__grid[data-count="4"] {
-    grid-template-columns: repeat(2, 1fr);
+  .row > div {
+    flex-basis: auto;
+  }
+
+  .columns,
+  .columns[data-count="2"] {
+    --count: 1;
+  }
+
+  .columns[data-count="4"] {
+    --count: 1;
+  }
+
+  .figure--drawing img {
+    max-height: 70svh;
   }
 }
 

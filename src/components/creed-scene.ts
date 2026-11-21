@@ -147,7 +147,7 @@ export async function createScene(canvas: HTMLCanvasElement, pin: HTMLElement, p
   };
 
   // Words are drawn instanced, one batch per word and kind, each copy with its own brightness.
-  type Group = "field" | "ahead" | "wall";
+  type Group = "field" | "ahead" | "above" | "wall";
   type Batch = { text: string; italic: boolean; side: THREE.Side; group: Group; items: { m: THREE.Matrix4; b: number }[] };
   const batches = new Map<string, Batch>();
   const add = (group: Group, text: string, italic: boolean, size: number, at: THREE.Vector3, turn: THREE.Quaternion, b: number, side: THREE.Side) => {
@@ -177,8 +177,11 @@ export async function createScene(canvas: HTMLCanvasElement, pin: HTMLElement, p
   // The words run well past the shafts on every side, so no corner of the screen goes bare
   // while the camera rolls.
   const X = Math.max((K + 0.5) * CX, vw * 4);
-  for (let j = LAYERS; j >= -DEEP; j--) {
+  // The walls above the phrase's carry words too. They would sit between you and the phrase at
+  // first, so they only come up once the camera has tipped and they fill the upper side of the view.
+  for (let j = K; j >= -DEEP; j--) {
     const y = (j + 0.5) * CY;
+    const high = j > LAYERS;
     let row = 0;
     for (let z = -L - vh * 1.4 + rowStep * 0.5; z < vh * 2.6; z += rowStep, row++) {
       for (let x = -X + (row % 2) * colStep * 0.5; x < X; x += colStep) {
@@ -188,7 +191,7 @@ export async function createScene(canvas: HTMLCanvasElement, pin: HTMLElement, p
         if (j === LAYERS && Math.abs(px) < vw * 0.3 && Math.abs(pz + L / 2) < vh * 0.36) continue;
         // Words past the shafts' open ends fill the corners while the camera rolls, then clear away
         // before it looks straight down, so that view stays nearly empty, as on Santal.
-        const group = pz > 0 ? "ahead" : "field";
+        const group = high ? "above" : pz > 0 ? "ahead" : "field";
         add(group, pick(creed.big), false, big, new THREE.Vector3(px, y, pz), lying, brightness(), THREE.DoubleSide);
         if (rand() < 0.25) {
           const turn = lying.clone().multiply(spin(rand() < 0.5 ? 72 : 14));
@@ -225,7 +228,7 @@ export async function createScene(canvas: HTMLCanvasElement, pin: HTMLElement, p
   }
 
   const plane = keep(new THREE.PlaneGeometry(1, 1));
-  const groups: Record<Group, THREE.MeshBasicMaterial[]> = { field: [], ahead: [], wall: [] };
+  const groups: Record<Group, THREE.MeshBasicMaterial[]> = { field: [], ahead: [], above: [], wall: [] };
   const color = new THREE.Color();
   for (const batch of batches.values()) {
     const { texture } = wordTexture(batch.text, batch.italic);
@@ -404,6 +407,7 @@ export async function createScene(canvas: HTMLCanvasElement, pin: HTMLElement, p
     const grow = ease(span(v, START, START + 90));
     for (const m of groups.field) m.opacity = grow * fade;
     for (const m of groups.ahead) m.opacity = grow * (1 - ease(span(v, 715, 765))) * fade;
+    for (const m of groups.above) m.opacity = ease(span(v, 560, 650)) * (1 - ease(span(v, 715, 765))) * fade;
     for (const m of groups.wall) m.opacity = ease(span(v, 620, 760)) * fade;
     // The phrase stays bright on "Feeling" while the rest of it settles into the field, then it
     // becomes just more of the field before the camera tips.

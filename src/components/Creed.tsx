@@ -61,8 +61,13 @@ function CreedSection() {
       shown = -1;
     };
 
+    // How wide the landing's ring is when it lies flat, as a share of the hairline's length.
+    let ring = 1;
     const measure = () => {
       vh = window.innerHeight;
+      const vw = window.innerWidth;
+      const W = vw < 760 ? vw * 1.7 : Math.min(vw, vh * 1.75);
+      ring = (2 * Math.min(W * 0.3, vw * 0.44) + W * 0.085) / (2.4 * Math.max(vw, vh));
       start = el.getBoundingClientRect().top + window.scrollY;
       shown = -1;
     };
@@ -85,19 +90,23 @@ function CreedSection() {
       if (Math.abs(v - shown) < 0.01) return;
       shown = v;
 
-      // On paper: the words rise, and a hairline swings down to become the horizon they sink into.
+      // Before it pins, the section lies clear over the landing, whose ring flattens into a line.
+      // Here that line becomes the horizon: it stretches to the screen's edges, and the words rise
+      // and sink into it.
+      const before = v < 0;
+      pinEl.style.background = before ? "transparent" : "";
       const rise = ease(span(v, 0, 120));
       const sink = ease(span(v, 150, 200));
       const lift = mix(0, -66.6, rise) - 35.4 * sink;
       block.current!.style.transform = `translate3d(0, calc(${mix(52, 0, rise).toFixed(3)}svh + ${lift.toFixed(3)}%), 0)`;
-      const swing = ease(span(v, 10, 120));
-      hair.current!.style.transform = `translate(-50%, -50%) rotate(${mix(-62, 0, swing).toFixed(3)}deg)`;
+      const stretch = ease(span(v, 0, 70));
+      hair.current!.style.transform = `translate(-50%, -50%) scaleX(${mix(ring, 1, stretch).toFixed(4)})`;
 
       // The dark closes in from both edges onto the horizon, which flares and goes out.
       const close = ease(span(v, 110, 155));
       top.current!.style.transform = `scaleY(${close.toFixed(4)})`;
       bottom.current!.style.transform = `scaleY(${close.toFixed(4)})`;
-      hair.current!.style.opacity = String(mix(0.22, 1, close) * (1 - span(v, 165, 190)));
+      hair.current!.style.opacity = before ? "0" : String(mix(mix(0.6, 0.22, stretch), 1, close) * (1 - span(v, 165, 190)));
       eyebrow.current!.style.opacity = String(span(v, 20, 50) * (1 - span(v, 90, 120)));
       light.current!.style.visibility = v > 210 ? "hidden" : "visible";
 

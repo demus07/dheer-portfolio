@@ -1,6 +1,7 @@
 /**
- * Frame-by-frame architectural transformation for the portfolio process section.
- * Scroll progress selects pre-rendered AVIF frames for precise, reversible motion.
+ * How he designs, shown with his own recording: the Maatik roof, from one truss in line to the
+ * finished workshop on its ground. Scroll progress selects AVIF frames, so it plays either way.
+ * scripts/prepare-videos.py makes the frames.
  */
 
 "use client";
@@ -11,17 +12,17 @@ import type { CSSProperties } from "react";
 import { onFrame } from "@/lib/ticker";
 
 const FRAME_COUNT = 181;
-const FRAME_DIRECTORY = "/process/architectural-interior-frames";
+const FRAME_DIRECTORY = "/process/maatik-roof";
 const PRELOAD_RADIUS = 10;
 const MAX_DEVICE_PIXEL_RATIO = 1.5;
 const SMOOTHING_TIME_CONSTANT_MS = 32;
 const PROCESS_STAGES = [
-  "It begins as an instinct.",
-  "The instinct finds its structure.",
-  "The structure becomes a space.",
+  "It begins with one line: the roof.",
+  "The roof finds its columns.",
+  "And the potters have a place of their own.",
 ] as const;
-const PLAN_START_FRAME = 46;
-const RENDER_START_FRAME = 85;
+const PLAN_START_FRAME = 62;
+const RENDER_START_FRAME = 141;
 
 const clamp = (value: number): number => Math.min(1, Math.max(0, value));
 
@@ -34,11 +35,16 @@ const getStageOpacities = (frameIndex: number): ReadonlyArray<number> => {
 const getFramePath = (frameIndex: number): string =>
   `${FRAME_DIRECTORY}/frame-${frameIndex.toString().padStart(3, "0")}.avif`;
 
+// The recording fills a landscape screen. On a phone it fits the width instead, on its white
+// paper, so the roof is never cut off.
 const drawFrame = (canvas: HTMLCanvasElement, image: HTMLImageElement): void => {
   const context = canvas.getContext("2d", { alpha: false });
   if (!context) return;
 
-  const scale = Math.max(canvas.width / image.naturalWidth, canvas.height / image.naturalHeight);
+  const fit = canvas.width > canvas.height ? Math.max : Math.min;
+  const scale = fit(canvas.width / image.naturalWidth, canvas.height / image.naturalHeight);
+  context.fillStyle = "#fff";
+  context.fillRect(0, 0, canvas.width, canvas.height);
   const width = image.naturalWidth * scale;
   const height = image.naturalHeight * scale;
   context.drawImage(image, (canvas.width - width) / 2, (canvas.height - height) / 2, width, height);
@@ -161,6 +167,7 @@ export function ProcessVideo() {
       <h2 className="process-video__title" id="process-video-title">
         How I design a space
       </h2>
+      <p className="process-video__note">The roof over the Maatik workshop, as I drew it.</p>
       <div className="process-video__timeline" ref={section}>
         <div className="process-video__sticky">
           <div className="process-video__frame">
@@ -168,11 +175,11 @@ export function ProcessVideo() {
               className="process-video__canvas"
               ref={canvas}
               role="img"
-              aria-label="Architectural interior transforming from drawing to finished space"
+              aria-label="The Maatik roof, drawn from one truss to the finished workshop"
             />
             <div
               className="process-video__stage-label"
-              aria-label="Design process: instinct, structure, and space"
+              aria-label="Design process: the roof, its columns, and the workshop"
             >
               {PROCESS_STAGES.map((stage, stageIndex) => (
                 <span

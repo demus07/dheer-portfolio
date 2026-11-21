@@ -1,0 +1,374 @@
+{
+ "maatik": {
+  "site-hall": {
+   "src": "/work/maatik/site-hall.webp",
+   "width": 2400,
+   "height": 1016,
+   "alt": "The IF BE warehouse as it stands",
+   "kind": "photo"
+  },
+  "site-court": {
+   "src": "/work/maatik/site-court.webp",
+   "width": 966,
+   "height": 870,
+   "alt": "Under the old roof",
+   "kind": "photo"
+  },
+  "site-stair": {
+   "src": "/work/maatik/site-stair.webp",
+   "width": 1272,
+   "height": 848,
+   "alt": "The stair beside the banyan",
+   "kind": "photo"
+  },
+  "potters-kiln": {
+   "src": "/work/maatik/potters-kiln.webp",
+   "width": 1200,
+   "height": 1500,
+   "alt": "Pots at a kiln in Kumbharwada",
+   "kind": "photo"
+  },
+  "potters-shop": {
+   "src": "/work/maatik/potters-shop.webp",
+   "width": 869,
+   "height": 651,
+   "alt": "A potter's workshop in Dharavi",
+   "kind": "photo"
+  },
+  "potters-wheel": {
+   "src": "/work/maatik/potters-wheel.webp",
+   "width": 772,
+   "height": 632,
+   "alt": "A potter among his pots",
+   "kind": "photo"
+  },
+  "site-map": {
+   "src": "/work/maatik/site-map.webp",
+   "width": 1374,
+   "height": 1787,
+   "alt": "IF BE in Ballard Estate",
+   "kind": "drawing"
+  },
+  "worktable": {
+   "src": "/work/maatik/worktable.mp4",
+   "poster": "/work/maatik/worktable.webp",
+   "width": 1080,
+   "height": 760,
+   "alt": "The worktable, drawn from क",
+   "kind": "video"
+  },
+  "meeting": {
+   "src": "/work/maatik/meeting.mp4",
+   "poster": "/work/maatik/meeting.webp",
+   "width": 1080,
+   "height": 760,
+   "alt": "The meeting table under its lamps",
+   "kind": "video"
+  },
+  "layout": {
+   "src": "/work/maatik/layout.webp",
+   "width": 2400,
+   "height": 1570,
+   "alt": "Furniture layout",
+   "kind": "drawing"
+  },
+  "concept-pottery": {
+   "src": "/work/maatik/concept-pottery.webp",
+   "width": 1280,
+   "height": 905,
+   "alt": "The potters' tables, for throwing, drying and curing",
+   "kind": "render"
+  },
+  "concept-cafe": {
+   "src": "/work/maatik/concept-cafe.webp",
+   "width": 1280,
+   "height": 905,
+   "alt": "The café, open to the workshop",
+   "kind": "render"
+  },
+  "sketch-trusses": {
+   "src": "/work/maatik/sketch-trusses.webp",
+   "width": 1944,
+   "height": 1123,
+   "alt": "Studies of the trusses",
+   "kind": "sketch"
+  },
+  "sketch-roof": {
+   "src": "/work/maatik/sketch-roof.webp",
+   "width": 1868,
+   "height": 771,
+   "alt": "The roof, in plan and in three dimensions",
+   "kind": "sketch"
+  },
+  "view-bar": {
+   "src": "/work/maatik/view-bar.webp",
+   "width": 2400,
+   "height": 1620,
+   "alt": "The café counter",
+   "kind": "render"
+  },
+  "view-lounge": {
+   "src": "/work/maatik/view-lounge.webp",
+   "width": 2400,
+   "height": 1906,
+   "alt": "Lounge below the stone wall",
+   "kind": "render"
+  },
+  "view-workshop": {
+   "src": "/work/maatik/view-workshop.webp",
+   "width": 2400,
+   "height": 1429,
+   "alt": "The potters' workshop",
+   "kind": "render"
+  },
+  "section-aa": {
+   "src": "/work/maatik/section-aa.webp",
+   "width": 2400,
+   "height": 427,
+   "alt": "Section A–A′, entrance to storage",
+   "kind": "drawing"
+  },
+  "view-library": {
+   "src": "/work/maatik/view-library.webp",
+   "width": 2400,
+   "height": 1596,
+   "alt": "Reading room",
+   "kind": "render"
+  },
+  "view-hall": {
+   "src": "/work/maatik/view-hall.webp",
+   "width": 2400,
+   "height": 1487,
+   "alt": "The workstations under the arches",
+   "kind": "render"
+  },
+  "view-shelves": {
+   "src": "/work/maatik/view-shelves.webp",
+   "width": 2400,
+   "height": 1952,
+   "alt": "Shelves beside the brick wall",
+   "kind": "render"
+  },
+  "section-bb": {
+   "src": "/work/maatik/section-bb.webp",
+   "width": 2400,
+   "height": 443,
+   "alt": "Section B–B′, conference room to office lobby",
+   "kind": "drawing"
+  },
+  "view-reading": {
+   "src": "/work/maatik/view-reading.webp",
+   "width": 2400,
+   "height": 1784,
+   "alt": "A long table between the shelves",
+   "kind": "render"
+  },
+  "view-arch": {
+   "src": "/work/maatik/view-arch.webp",
+   "width": 2400,
+   "height": 1487,
+   "alt": "Through the arch",
+   "kind": "render"
+  },
+  "view-court": {
+   "src": "/work/maatik/view-court.webp",
+   "width": 2400,
+   "height": 1459,
+   "alt": "Lounge by the court",
+   "kind": "render"
+  },
+  "section-cc": {
+   "src": "/work/maatik/section-cc.webp",
+   "width": 2400,
+   "height": 554,
+   "alt": "Section C–C′, through the banyan court",
+   "kind": "drawing"
+  }
+ },
+ "light-of-bharat": {
+  "signage": {
+   "src": "/work/light-of-bharat/signage.webp",
+   "width": 862,
+   "height": 584,
+   "alt": "The signboard today",
+   "kind": "photo"
+  },
+  "existing-plan": {
+   "src": "/work/light-of-bharat/existing-plan.webp",
+   "width": 1756,
+   "height": 1716,
+   "alt": "The existing floor plan",
+   "kind": "drawing"
+  },
+  "sketch-concept": {
+   "src": "/work/light-of-bharat/sketch-concept.webp",
+   "width": 1592,
+   "height": 2035,
+   "alt": "Concept sketches of the curved room",
+   "kind": "sketch"
+  },
+  "sketch-space": {
+   "src": "/work/light-of-bharat/sketch-space.webp",
+   "width": 1432,
+   "height": 2373,
+   "alt": "The old and the new, side by side",
+   "kind": "sketch"
+  },
+  "sketch-direction": {
+   "src": "/work/light-of-bharat/sketch-direction.webp",
+   "width": 1542,
+   "height": 1389,
+   "alt": "Planning the room for thirty",
+   "kind": "sketch"
+  },
+  "layout": {
+   "src": "/work/light-of-bharat/layout.webp",
+   "width": 2400,
+   "height": 2345,
+   "alt": "Furniture layout",
+   "kind": "drawing"
+  },
+  "section-aa": {
+   "src": "/work/light-of-bharat/section-aa.webp",
+   "width": 2400,
+   "height": 769,
+   "alt": "Section A–A1",
+   "kind": "drawing"
+  },
+  "section-bb": {
+   "src": "/work/light-of-bharat/section-bb.webp",
+   "width": 2400,
+   "height": 829,
+   "alt": "Section B–B1",
+   "kind": "drawing"
+  }
+ },
+ "shararat": {
+  "levels": {
+   "src": "/work/shararat/levels.webp",
+   "width": 1546,
+   "height": 2512,
+   "alt": "The four levels, ground floor to mezzanine",
+   "kind": "sketch"
+  },
+  "sketch-concept": {
+   "src": "/work/shararat/sketch-concept.webp",
+   "width": 1580,
+   "height": 2277,
+   "alt": "Sketching the ground floor",
+   "kind": "sketch"
+  },
+  "sketch-space": {
+   "src": "/work/shararat/sketch-space.webp",
+   "width": 1345,
+   "height": 1452,
+   "alt": "The existing structure, in three dimensions",
+   "kind": "sketch"
+  },
+  "sketch-direction": {
+   "src": "/work/shararat/sketch-direction.webp",
+   "width": 1467,
+   "height": 2366,
+   "alt": "The vaulted lounge, and its furniture",
+   "kind": "sketch"
+  },
+  "plans-ground": {
+   "src": "/work/shararat/plans-ground.webp",
+   "width": 2400,
+   "height": 2000,
+   "alt": "Ground floor and mezzanine plans",
+   "kind": "drawing"
+  },
+  "view-jazz": {
+   "src": "/work/shararat/view-jazz.webp",
+   "width": 2400,
+   "height": 1402,
+   "alt": "The lounge with the palm wallpaper",
+   "kind": "render"
+  },
+  "view-cowork": {
+   "src": "/work/shararat/view-cowork.webp",
+   "width": 2400,
+   "height": 1402,
+   "alt": "The coworking bar",
+   "kind": "render"
+  },
+  "plans-first": {
+   "src": "/work/shararat/plans-first.webp",
+   "width": 2400,
+   "height": 2024,
+   "alt": "First floor plans",
+   "kind": "drawing"
+  },
+  "view-open": {
+   "src": "/work/shararat/view-open.webp",
+   "width": 2400,
+   "height": 1402,
+   "alt": "The open workspace on the first floor",
+   "kind": "render"
+  },
+  "view-intimate": {
+   "src": "/work/shararat/view-intimate.webp",
+   "width": 2400,
+   "height": 1402,
+   "alt": "The long seat, for quieter work",
+   "kind": "render"
+  },
+  "section-aa": {
+   "src": "/work/shararat/section-aa.webp",
+   "width": 2400,
+   "height": 1722,
+   "alt": "Section A–A′",
+   "kind": "drawing"
+  },
+  "section-bb": {
+   "src": "/work/shararat/section-bb.webp",
+   "width": 2400,
+   "height": 1789,
+   "alt": "Section B–B′",
+   "kind": "drawing"
+  },
+  "view-cigar": {
+   "src": "/work/shararat/view-cigar.webp",
+   "width": 2400,
+   "height": 1402,
+   "alt": "The cigar bar",
+   "kind": "render"
+  },
+  "view-columns": {
+   "src": "/work/shararat/view-columns.webp",
+   "width": 2400,
+   "height": 1402,
+   "alt": "Between the columns",
+   "kind": "render"
+  },
+  "view-speakers": {
+   "src": "/work/shararat/view-speakers.webp",
+   "width": 2400,
+   "height": 1402,
+   "alt": "The speaker wall",
+   "kind": "render"
+  },
+  "view-office": {
+   "src": "/work/shararat/view-office.webp",
+   "width": 2400,
+   "height": 1402,
+   "alt": "The office lounge",
+   "kind": "render"
+  },
+  "view-pantry": {
+   "src": "/work/shararat/view-pantry.webp",
+   "width": 2400,
+   "height": 1402,
+   "alt": "The pantry",
+   "kind": "render"
+  },
+  "section-cc": {
+   "src": "/work/shararat/section-cc.webp",
+   "width": 2400,
+   "height": 1069,
+   "alt": "Section C–C′",
+   "kind": "drawing"
+  }
+ }
+}

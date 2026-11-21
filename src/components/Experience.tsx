@@ -12,25 +12,26 @@ import { Loader } from "./Loader";
 import { ProcessVideo } from "./ProcessVideo";
 import { onFrame } from "@/lib/ticker";
 
-const cards = projects.flatMap((p, i) => ringCards[p.slug].map((src) => ({ src, project: i, slug: p.slug })));
+// The ring holds renders only. Hubtown has drawings and no renders, so it sits out.
+const cards = projects.flatMap((p, i) =>
+  work[p.slug][p.cover].kind === "render" ? ringCards[p.slug].map((src) => ({ src, project: i, slug: p.slug })) : [],
+);
 const N = cards.length;
-// The projects, as Santal shows its works: a full-bleed wall of pictures in three columns.
-// The four projects take turns down the wall. Hubtown has only drawings, so one is shown on paper.
-const shots = (() => {
-  const picks: [string, string[]][] = [
-    ["shararat", ["bar", "lounge", "mezzanine", "vinyl", "booths", "library", "passage"]],
-    ["maatik", ["facade", "cafe", "workshop", "lounge", "swing", "library", "office"]],
-    ["light-of-bharat", ["dining", "counter", "today", "bar", "chess"]],
-    ["hubtown-seasons", ["passage"]],
-  ];
-  const lists = picks.map(([slug, names]) => {
-    const title = projects.find((p) => p.slug === slug)!.title;
-    return names.map((n) => ({ ...work[slug][n], slug, title, paper: work[slug][n].kind === "drawing" }));
-  });
-  const out: (typeof lists)[number] = [];
-  for (let i = 0; out.length < lists.flat().length; i++) for (const l of lists) if (l[i]) out.push(l[i]);
-  return out;
-})();
+// The projects, as Santal shows its works: a full-bleed wall of renders in three columns, three deep.
+// Read across, each row holds all three projects, and no column repeats one.
+const shots = (
+  [
+    ["shararat", "bar"],
+    ["maatik", "facade"],
+    ["light-of-bharat", "dining"],
+    ["maatik", "cafe"],
+    ["light-of-bharat", "chess"],
+    ["shararat", "mezzanine"],
+    ["light-of-bharat", "counter"],
+    ["shararat", "booths"],
+    ["maatik", "swing"],
+  ] as const
+).map(([slug, name]) => ({ ...work[slug][name], slug, title: projects.find((p) => p.slug === slug)!.title }));
 const columns = [0, 1, 2].map((c) => shots.filter((_, i) => i % 3 === c));
 // How far each column starts below the others, in screens. The middle one leads, as on Santal.
 // After that each column slides at its own pace, set by its height so all three finish level.
@@ -62,6 +63,7 @@ export function Experience() {
   useEffect(() => {
     const stageEl = stage.current!;
     const tiltEl = tilt.current!;
+    const drumEl = tiltEl.parentElement!;
     const spinEl = spin.current!;
     const reelEl = reel.current!;
     const canvas = canvasRef.current!;
@@ -157,10 +159,12 @@ export function Experience() {
       last = now;
       const y = window.scrollY;
 
-      // The drum turns on its own, and the scroll turns it further.
+      // The drum turns on its own, and the scroll turns it further. At the end the ring turns
+      // edge-on and flattens into a single line, which the creed takes up as its horizon.
       if (y < stageTop + stageH) {
         const p = clamp((y - stageTop) / (stageH - vh));
-        const open = ease(span(p, 0, 0.55));
+        const open = ease(span(p, 0, 0.38));
+        const exit = ease(span(p, 0.7, 0.97));
         // It drifts on its own, slowing as it opens, and the scroll adds only a gentle quarter turn,
         // so the ring never whips round under the reader.
         if (!still) rot += dt * mix(0.006, 0.0025, open);
@@ -169,14 +173,20 @@ export function Experience() {
         const drumR = W * 0.25;
         const ringR = Math.min(W * 0.3, vw * 0.44);
         const drumScale = (Math.PI * 2 * drumR) / N / (W * 0.085);
-        tiltEl.style.transform = `translateY(${mix(vh * 0.11, vh * 0.02, open).toFixed(1)}px) rotateX(${mix(-9, -24, open).toFixed(2)}deg)`;
-        spinEl.style.transform = `rotateY(${(-turn).toFixed(2)}deg)`;
+        const lift = mix(mix(vh * 0.11, vh * 0.02, open), 0, exit);
+        const tip = mix(mix(-9, -24, open), 0, exit);
+        tiltEl.style.transform = `translateY(${lift.toFixed(1)}px) rotateX(${tip.toFixed(2)}deg)`;
+        // Seen from its own height the ring is a band; squashed, the band is a line.
+        drumEl.style.perspectiveOrigin = `50% ${mix(30, 50, exit).toFixed(2)}%`;
+        const flat = mix(1, 1.2 / (W * 0.16 * 0.72), ease(span(exit, 0.45, 1)));
+        spinEl.style.transform = `scale3d(1, ${flat.toFixed(4)}, 1) rotateY(${(-turn).toFixed(2)}deg)`;
         spinEl.style.setProperty("--r", `${mix(drumR, ringR, open).toFixed(1)}px`);
         spinEl.style.setProperty("--fin", `${mix(0, 72, open).toFixed(2)}deg`);
         spinEl.style.setProperty("--sx", mix(drumScale * 1.02, 1, open).toFixed(4));
         spinEl.style.setProperty("--sy", mix(1, 0.72, open).toFixed(4));
         stageEl.style.setProperty("--open", open.toFixed(4));
-        const isOpen = String(open > 0.9);
+        stageEl.style.setProperty("--exit", exit.toFixed(4));
+        const isOpen = String(open > 0.9 && exit < 0.4);
         if (stageEl.dataset.open !== isOpen) stageEl.dataset.open = isOpen;
 
         // The card turned most toward the viewer names its project.
@@ -191,13 +201,13 @@ export function Experience() {
       if (y > reelTop - vh * 4) loadFilm();
       if (y + vh > reelTop && y < reelTop + reelH) {
         const q = clamp((y - reelTop) / (reelH - vh));
-        filmT += (span(q, 0.02, 0.9) - filmT) * (still ? 1 : 0.18);
-        // At the end the film closes from both sides to a hairline, as Santal's last panel turns edge-on.
-        const shut = ease(span(q, 0.9, 0.98));
-        boxEl.style.clipPath =
-          shut > 0 ? `inset(${(shut * 15).toFixed(2)}svh calc(${(shut * 50).toFixed(3)}% - ${shut.toFixed(3)}px))` : "none";
-        boxEl.style.opacity = String(1 - span(q, 0.985, 1));
-        reelEl.style.setProperty("--shut", shut.toFixed(3));
+        filmT += (span(q, 0.02, 0.74) - filmT) * (still ? 1 : 0.18);
+        // Its last screen lies under the projects. As their wall rises over it, the film settles
+        // back and dims into the dark, so the pictures arrive on it, never after a blank screen.
+        const recede = ease(span(q, 0.74, 1));
+        boxEl.style.transform = recede > 0 ? `scale(${(1 - recede * 0.1).toFixed(4)})` : "";
+        boxEl.style.opacity = String(1 - recede * 0.94);
+        reelEl.style.setProperty("--shut", recede.toFixed(3));
         drawFilm(filmT * (filmFrames.count - 1));
         const c = film.findIndex((s) => q >= s.from && q <= s.to);
         if (c !== shownCaption) {
@@ -208,12 +218,16 @@ export function Experience() {
 
       // The projects rise from below, the middle column first, and the columns keep their own pace.
       // Their title comes up at the top only once the section has, so it never slides across the film.
+      // The wall is three pictures deep, so it settles by the time its foot reaches the screen's.
+      // On a phone it is shorter than the screen and simply stays put.
       if (y + vh > worksTop && y < worksTop + worksH) {
         worksEl.style.setProperty("--label", span(y, worksTop - vh * 0.2, worksTop).toFixed(3));
-        const rise = still ? 1 : ease(span(y, worksTop - vh, worksTop + vh * 0.6));
-        const along = clamp((y - worksTop) / Math.max(1, worksH - vh));
+        const fixed = still || vw < 760;
+        const settle = worksTop + Math.max(1, worksH - vh);
+        const rise = fixed ? 1 : ease(span(y, worksTop - vh, settle));
+        const along = span(y, worksTop, settle);
         colRefs.current.forEach((col, i) => {
-          const off = still ? 0 : lag[i] * vh * (1 - rise) + (Math.max(...colH) - colH[i]) * along;
+          const off = fixed ? 0 : lag[i] * vh * (1 - rise) + (Math.max(...colH) - colH[i]) * along;
           col.style.transform = `translate3d(0, ${off.toFixed(2)}px, 0)`;
         });
       }
@@ -261,7 +275,7 @@ export function Experience() {
                     key={i}
                     href={`/work/${card.slug}`}
                     tabIndex={-1}
-                    className={card.slug === "hubtown-seasons" ? "card card--paper" : "card"}
+                    className="card"
                     style={{ "--a": `${(i / N) * 360}deg` } as React.CSSProperties}
                   >
                     <img src={card.src} alt="" draggable={false} />
@@ -330,7 +344,7 @@ export function Experience() {
               }}
             >
               {column.map((shot) => (
-                <Link key={shot.src} href={`/work/${shot.slug}`} className="shot" data-paper={shot.paper} aria-label={`${shot.title}, ${shot.alt}`}>
+                <Link key={shot.src} href={`/work/${shot.slug}`} className="shot" aria-label={`${shot.title}, ${shot.alt}`}>
                   <Image src={shot.src} alt={shot.alt} width={shot.width} height={shot.height} sizes="(max-width: 760px) 50vw, 33vw" />
                   <span className="shot__name" aria-hidden>
                     {shot.title}
