@@ -12,10 +12,7 @@ import { Loader } from "./Loader";
 import { ProcessVideo } from "./ProcessVideo";
 import { onFrame } from "@/lib/ticker";
 
-// The ring holds renders only. Hubtown has drawings and no renders, so it sits out.
-const cards = projects.flatMap((p, i) =>
-  work[p.slug][p.cover].kind === "render" ? ringCards[p.slug].map((src) => ({ src, project: i, slug: p.slug })) : [],
-);
+const cards = projects.flatMap((p, i) => ringCards[p.slug].map((src) => ({ src, project: i, slug: p.slug })));
 const N = cards.length;
 // The projects, as Santal shows its works: a full-bleed wall of renders in three columns, three deep.
 // Read across, each row holds all three projects, and no column repeats one.

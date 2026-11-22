@@ -264,13 +264,7 @@ def main():
     save("light-of-bharat", "section", trim(page_render(PROJ / "fin lob sections final-Model.pdf 3.pdf", width=3000)), alt="Section A–A1", kind="drawing")
     ring("light-of-bharat", [imgs[k] for k in ["dining", "chess", "counter", "bar", "dining", "chess", "bar", "counter"]])
 
-    # Hubtown Seasons: drawings from the internship
-    plan = save("hubtown-seasons", "plan", trim(page_render(pf, 24, 3000, clip=(450, 250, 2800, 3350))), alt="Sales office floor plan", kind="drawing")
-    elev = save("hubtown-seasons", "elevations", trim(page_render(pf, 30, 3200, clip=(2000, 480, 4000, 2420))), alt="Passage 9 elevations", kind="drawing")
-    side = save("hubtown-seasons", "passage", trim(page_render(pf, 30, 2400, clip=(480, 480, 1990, 2420))), alt="Passage 8 elevations", kind="drawing")
-    ring("hubtown-seasons", [elev, side, plan, elev, side, plan, elev, side])
-
-    for slug, page in [("maatik", 3), ("light-of-bharat", 10), ("shararat", 16), ("hubtown-seasons", 23)]:
+    for slug, page in [("maatik", 3), ("light-of-bharat", 10), ("shararat", 16)]:
         sketch(slug, page)
 
     # The sketchbook

@@ -265,29 +265,6 @@
     "kind": "drawing"
    }
   },
-  "hubtown-seasons": {
-   "plan": {
-    "src": "/work/hubtown-seasons/plan.webp",
-    "width": 2400,
-    "height": 3238,
-    "alt": "Sales office floor plan",
-    "kind": "drawing"
-   },
-   "elevations": {
-    "src": "/work/hubtown-seasons/elevations.webp",
-    "width": 2400,
-    "height": 2288,
-    "alt": "Passage 9 elevations",
-    "kind": "drawing"
-   },
-   "passage": {
-    "src": "/work/hubtown-seasons/passage.webp",
-    "width": 2312,
-    "height": 3071,
-    "alt": "Passage 8 elevations",
-    "kind": "drawing"
-   }
-  },
   "sketchbook": {
    "page-1": {
     "src": "/work/sketchbook/page-1.webp",
@@ -335,16 +312,6 @@
    "/ring/light-of-bharat-6.webp",
    "/ring/light-of-bharat-7.webp",
    "/ring/light-of-bharat-8.webp"
-  ],
-  "hubtown-seasons": [
-   "/ring/hubtown-seasons-1.webp",
-   "/ring/hubtown-seasons-2.webp",
-   "/ring/hubtown-seasons-3.webp",
-   "/ring/hubtown-seasons-4.webp",
-   "/ring/hubtown-seasons-5.webp",
-   "/ring/hubtown-seasons-6.webp",
-   "/ring/hubtown-seasons-7.webp",
-   "/ring/hubtown-seasons-8.webp"
   ]
  },
  "sketches": {
@@ -362,11 +329,6 @@
    "src": "/sketches/shararat.svg",
    "width": 4097,
    "height": 2728
-  },
-  "hubtown-seasons": {
-   "src": "/sketches/hubtown-seasons.svg",
-   "width": 2245,
-   "height": 1832
   }
  },
  "film": {

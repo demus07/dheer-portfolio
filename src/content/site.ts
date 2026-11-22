@@ -109,7 +109,7 @@ export const journey = {
       when: "Along the way",
       what: "Interned in interior design",
       where: "Essence of Art, and Space X",
-      image: "/work/hubtown-seasons/plan.webp",
+      image: "/work/sketchbook/page-2.webp",
     },
     {
       when: "2025",
@@ -450,45 +450,6 @@ export const projects: Project[] = [
           "The section reads as more functional than experiential. The large volumes could use stronger moments of compression and release, and a clearer order between the programmes.",
         ],
         drawings: ["section-cc"],
-      },
-    ],
-  },
-  {
-    slug: "hubtown-seasons",
-    title: "Hubtown Seasons",
-    line: "A sales lobby in Chembur, from idea to execution.",
-    subtitle: "Sales office lobby",
-    credit: "Internship at Essence of Art",
-    cover: "elevations",
-    site: { name: "Hubtown Seasons", address: "Ramakrishna Chemburkar Marg, Chembur East, Mumbai" },
-    facts: [
-      { label: "Client", value: "Hubtown" },
-      { label: "Area", value: "6,000 sq ft" },
-      { label: "Ceiling", value: "15 ft" },
-    ],
-    intro: [
-      "My first project from idea to execution, as an intern at Essence of Art.",
-      "A spacious, contemporary sales lounge that uses its irregular footprint to make a journey for visitors. The fifteen-foot ceiling gives it openness, and the large floor in the middle leaves room for meetings, presentations and informal talk.",
-    ],
-    chapters: [
-      {
-        kind: "layout",
-        title: "Floor plan",
-        drawing: "plan",
-        body: [
-          "A premium but approachable sales experience, where materials, light and carefully placed furniture tell visitors who Hubtown is.",
-          "Rather than a conventional sales office, warm timber, stone, glass, metal and layered light give it the feel of hospitality. The irregular edges hold the meeting rooms, consultation spaces and storage, and the centre stays open.",
-        ],
-      },
-      {
-        kind: "views",
-        title: "The passages",
-        images: [],
-        body: [
-          "Large glazed panels and solid walls in a measured vertical rhythm. The glass keeps the lounge open and approachable; the solid parts carry branding and display.",
-          "The fifteen-foot height gives the passages their tall proportions, and the textured wall and dark verticals give them definition.",
-        ],
-        drawings: ["elevations", "passage"],
       },
     ],
   },
