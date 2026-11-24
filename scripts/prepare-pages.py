@@ -114,7 +114,7 @@ def main():
     drawing(lob, "sketch-concept", 12, (350, 750, 1650, 2450), "Concept sketches of the curved room", "sketch", 1600)
     drawing(lob, "sketch-space", 12, (1900, 780, 3050, 2500), "The old and the new, side by side", "sketch", 1600)
     drawing(lob, "sketch-direction", 12, (3200, 950, 4650, 2300), "Planning the room for thirty", "sketch", 1600)
-    drawing(lob, "layout", 13, (450, 680, 2800, 2960), "Furniture layout", width=2600)
+    drawing(lob, "layout", 13, (450, 680, 3100, 2960), "Furniture layout", width=2600)
     drawing(lob, "section-aa", 14, (380, 2020, 3520, 3060), "Section A–A1", width=3000)
     drawing(lob, "section-bb", 15, (200, 1950, 3550, 3150), "Section B–B1", width=3000)
 
@@ -126,7 +126,7 @@ def main():
     drawing(s, "plans-ground", 19, (300, 650, 2950, 2780), "Ground floor and mezzanine plans", width=3000)
     photo(s, "view-jazz", 1819, "The lounge with the palm wallpaper")
     photo(s, "view-cowork", 1818, "The coworking bar")
-    drawing(s, "plans-first", 20, (350, 420, 2950, 2650), "First floor plans", width=3000)
+    drawing(s, "plans-first", 20, (350, 420, 2950, 2650), "First floor and mezzanine plans", width=3000)
     photo(s, "view-open", 1823, "The open workspace on the first floor")
     photo(s, "view-intimate", 1822, "The long seat, for quieter work")
     drawing(s, "section-aa", 21, (380, 250, 2250, 1650), "Section A–A′", width=2600)

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { CSSProperties, ReactNode } from "react";
 import { Footer } from "@/components/Footer";
 import { LoopVideo } from "@/components/LoopVideo";
 import { projects, sketches, work, type Chapter, type Text } from "@/content/site";
@@ -32,18 +33,36 @@ function Figure({ slug, name, sizes, caption = true }: { slug: string; name: str
   );
 }
 
-// Pictures in a row at one height, each as wide as its proportions ask, so nothing is cropped.
-function Row({ slug, names }: { slug: string; names: string[] }) {
+// Pictures side by side in equal columns, so words set in the same columns start at each
+// picture's left edge. Photographs and renders share one frame, cropped a little to match.
+// Drawings and sketches are never cropped: each sits whole in a frame as tall as the tallest,
+// up to a little taller than square, so one long sketch doesn't stretch the row.
+function Grid({ slug, names, caption = true }: { slug: string; names: string[]; caption?: boolean }) {
+  const items = names.map((name) => work[slug][name]);
+  const whole = items.every((i) => i.kind === "drawing" || i.kind === "sketch");
+  const ratios = items.map((i) => i.width / i.height);
+  const ratio = whole ? Math.max(Math.min(...ratios), 0.85) : ratios.reduce((a, b) => a + b) / ratios.length;
   return (
-    <div className="row">
-      {names.map((name) => {
-        const { width, height } = work[slug][name];
-        return (
-          <div key={name} style={{ flexGrow: width / height }}>
-            <Figure slug={slug} name={name} sizes={`(max-width: 760px) 100vw, ${Math.round(100 / names.length)}vw`} />
-          </div>
-        );
-      })}
+    <div className="grid" data-whole={whole} style={{ "--count": names.length, "--ratio": ratio.toFixed(3), "--k": 1 } as CSSProperties}>
+      {names.map((name, i) => (
+        <div key={name} style={{ "--i": i } as CSSProperties}>
+          <Figure slug={slug} name={name} sizes={`(max-width: 760px) 100vw, ${Math.round(100 / names.length)}vw`} caption={caption} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Paragraphs in the columns of the pictures above or below them. `k` is their place in a column
+// (title, picture, words), so on a phone each column's pieces can come back together.
+function Columns({ count, k = 2, children }: { count: number; k?: number; children: ReactNode[] }) {
+  return (
+    <div className={k === 0 ? "grid grid--words grid--lead" : "grid grid--words"} style={{ "--count": count, "--k": k } as CSSProperties}>
+      {children.map((child, i) => (
+        <div key={i} style={{ "--i": i } as CSSProperties}>
+          {child}
+        </div>
+      ))}
     </div>
   );
 }
@@ -59,61 +78,94 @@ function Words({ text }: { text: Text }) {
   );
 }
 
+// A technical drawing, centred, never wider than the page or taller than the screen.
+function Drawing({ slug, name }: { slug: string; name: string }) {
+  return (
+    <div className="drawing">
+      <Figure slug={slug} name={name} sizes="(max-width: 760px) 100vw, 90vw" />
+    </div>
+  );
+}
+
 function Spread({ slug, chapter }: { slug: string; chapter: Chapter }) {
   switch (chapter.kind) {
-    // A tall drawing sits beside the words, as in his portfolio; photographs run in a row under them.
+    // A tall drawing sits beside the words, as in his portfolio; photographs run in a grid under them.
     case "story": {
-      const tall = chapter.images.length === 1;
+      if (chapter.images.length === 1)
+        return (
+          <section className="chapter story" data-tall>
+            <Figure slug={slug} name={chapter.images[0]} sizes="(max-width: 760px) 100vw, 40vw" />
+            <div className="story__words">
+              {chapter.texts.map((t) => (
+                <Words key={t.title ?? t.body[0]} text={t} />
+              ))}
+            </div>
+          </section>
+        );
       return (
-        <section className="chapter story" data-tall={tall}>
-          {tall && <Figure slug={slug} name={chapter.images[0]} sizes="(max-width: 760px) 100vw, 40vw" />}
-          <div className="story__words" data-count={chapter.texts.length}>
+        <section className="chapter story">
+          <Columns count={chapter.images.length} k={0}>
             {chapter.texts.map((t) => (
               <Words key={t.title ?? t.body[0]} text={t} />
             ))}
-          </div>
-          {!tall && <Row slug={slug} names={chapter.images} />}
+          </Columns>
+          <Grid slug={slug} names={chapter.images} />
         </section>
       );
     }
-    case "columns":
+    // Each column is a title, a picture and its words; the rows line up across the columns.
+    case "columns": {
+      const titled = chapter.columns.some((c) => c.title);
+      const media = chapter.columns.flatMap((c) => c.media);
       return (
-        <section className="chapter">
+        <section className="chapter" data-pair>
           {chapter.title && <h2 className="chapter__title">{chapter.title}</h2>}
-          <div className="columns" data-count={chapter.columns.length}>
+          {titled && (
+            <Columns count={chapter.columns.length} k={0}>
+              {chapter.columns.map((c, i) => (
+                <h3 key={i} className="chapter__title">
+                  {c.title}
+                </h3>
+              ))}
+            </Columns>
+          )}
+          <Grid slug={slug} names={media} caption={false} />
+          <Columns count={chapter.columns.length}>
             {chapter.columns.map((c, i) => (
-              <div key={i} className="columns__item">
-                {c.title && <h3 className="chapter__title">{c.title}</h3>}
-                {c.media.map((name) => (
-                  <Figure key={name} slug={slug} name={name} sizes={`(max-width: 760px) 100vw, ${Math.round(100 / chapter.columns.length)}vw`} caption={false} />
-                ))}
+              <div key={i} className="words">
                 {c.body.map((p) => (
                   <p key={p}>{p}</p>
                 ))}
               </div>
             ))}
-          </div>
+          </Columns>
         </section>
       );
+    }
     case "layout":
       return (
-        <section className="chapter layout">
-          <Figure slug={slug} name={chapter.drawing} sizes="(max-width: 760px) 100vw, 66vw" />
-          <Words text={{ title: chapter.title, body: chapter.body }} />
+        <section className="chapter">
+          <h2 className="chapter__title">{chapter.title}</h2>
+          <Columns count={3}>
+            {chapter.body.map((p) => (
+              <p key={p}>{p}</p>
+            ))}
+          </Columns>
+          <Drawing slug={slug} name={chapter.drawing} />
         </section>
       );
     case "views":
       return (
-        <section className="chapter views">
-          {chapter.images.length > 0 && <Row slug={slug} names={chapter.images} />}
-          <div className="views__words">
-            {chapter.title && <h2 className="chapter__title">{chapter.title}</h2>}
+        <section className="chapter" data-pair>
+          {chapter.title && <h2 className="chapter__title">{chapter.title}</h2>}
+          {chapter.images.length > 0 && <Grid slug={slug} names={chapter.images} />}
+          <Columns count={Math.max(chapter.images.length, 2)}>
             {chapter.body.map((p) => (
               <p key={p}>{p}</p>
             ))}
-          </div>
+          </Columns>
           {chapter.drawings?.map((name) => (
-            <Figure key={name} slug={slug} name={name} sizes="(max-width: 760px) 100vw, 90vw" />
+            <Drawing key={name} slug={slug} name={name} />
           ))}
         </section>
       );

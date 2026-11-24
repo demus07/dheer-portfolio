@@ -223,8 +223,8 @@
   },
   "layout": {
    "src": "/work/light-of-bharat/layout.webp",
-   "width": 2400,
-   "height": 2345,
+   "width": 2333,
+   "height": 2237,
    "alt": "Furniture layout",
    "kind": "drawing"
   },
@@ -297,7 +297,7 @@
    "src": "/work/shararat/plans-first.webp",
    "width": 2400,
    "height": 2024,
-   "alt": "First floor plans",
+   "alt": "First floor and mezzanine plans",
    "kind": "drawing"
   },
   "view-open": {

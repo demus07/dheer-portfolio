@@ -6,7 +6,19 @@ import { BackToTop } from "./BackToTop";
 export function Footer() {
   return (
     <footer className="footer" id="contact">
-      <h2 className="footer__title">Let’s talk</h2>
+      {/* The journey's road runs on past its last stop, down to one more: here. */}
+      <div className="footer__road" aria-hidden>
+        <span className="footer__line" />
+        <span className="footer__stop" />
+      </div>
+      <h2 className="footer__title" aria-label="Let’s talk">
+        <span className="footer__word" aria-hidden>
+          <span>Let’s</span>
+        </span>{" "}
+        <span className="footer__word" aria-hidden>
+          <span>talk</span>
+        </span>
+      </h2>
       <div className="footer__links" aria-label="Contact and social profiles">
         <a className="footer__social" href={`mailto:${site.email}`} aria-label={`Email ${site.fullName}`}>
           <FaRegEnvelope aria-hidden="true" />

@@ -1,12 +1,12 @@
 // The dark half of the creed, drawn in WebGL, after Santal's philosophy section.
 //
-// A block of hollow shafts runs away from you along -z, and his words are written on the shafts'
-// walls. The camera starts above the block looking straight down onto the horizontal walls, so
+// A block of hollow shafts, stacked cube on cube, runs away from you along -z, and his words are
+// written on the walls. The camera starts above the block looking straight down onto the horizontal walls, so
 // the words read as a flat, layered field, with "Feeling before form." on the top one, exactly
 // where the page drew it. Then, in one continuous move, it pulls back, rolls until the words stand
 // almost upright, and pitches a quarter turn: the walls go edge-on and the words thin to streaks.
-// It settles looking straight down the shafts and dives into the middle one. The Shararat film is
-// that shaft's floor, and the dive ends with it filling the screen exactly as the walkthrough begins.
+// It settles looking straight down the shafts and dives into the middle one, through cube after
+// cube. The Shararat film is that shaft's floor, and the dive ends with it filling the screen exactly as the walkthrough begins.
 //
 // Creed.tsx keeps its own copy of START and END, so three.js stays out of the main bundle.
 
@@ -65,12 +65,14 @@ export type Scene = {
 export async function createScene(canvas: HTMLCanvasElement, pin: HTMLElement, phrase: Phrase[], still: boolean): Promise<Scene> {
   const vw = pin.clientWidth;
   const vh = pin.clientHeight;
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  // A phone in portrait: fewer words, fewer pixels, so the scroll stays smooth.
+  const tall = vh > vw;
+  const dpr = Math.min(window.devicePixelRatio || 1, tall ? 1.5 : 2);
   const family = getComputedStyle(phrase[0].mask).fontFamily;
   const phraseSize = parseFloat(getComputedStyle(phrase[0].mask).fontSize);
   await Promise.all([document.fonts.load(`400 100px ${family}`), document.fonts.load(`italic 400 100px ${family}`)]);
 
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: "high-performance" });
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: dpr < 1.5, alpha: false, powerPreference: "high-performance" });
   renderer.setPixelRatio(dpr);
   renderer.setSize(vw, vh, false);
   const VOID = new THREE.Color("#151419");
@@ -88,7 +90,10 @@ export async function createScene(canvas: HTMLCanvasElement, pin: HTMLElement, p
   // in x and CY in y, which is the screen's shape once you look down it.
   const CX = vh * CELL;
   const CY = vw * CELL;
-  const L = vh * 3.2; // how deep the shafts run
+  // Each shaft is a stack of cubes, about as deep as they are wide.
+  const CZ = Math.max(CX, CY) * 0.9;
+  const LAYERS_DEEP = Math.max(3, Math.round((vh * 3.2) / CZ));
+  const L = CZ * LAYERS_DEEP; // how deep the shafts run
   const yTop = (LAYERS + 0.5) * CY; // the highest wall with words: the phrase lies on it
 
   const target = new THREE.Vector3();
@@ -99,23 +104,39 @@ export async function createScene(canvas: HTMLCanvasElement, pin: HTMLElement, p
   const disposables: { dispose: () => void }[] = [];
   const keep = <T extends { dispose: () => void }>(x: T) => (disposables.push(x), x);
 
-  // The shafts, as hairlines: the mouths, the floors, and the edges running between them.
+  // The cubes, as hairlines: a ring of edges at every layer, and the edges running between them.
+  // A few edges catch the light, as on Santal, and read a little brighter than the rest.
+  const lineRand = seeded(5);
   const p: number[] = [];
+  const glint: number[] = [];
   {
     const X = (K + 0.5) * CX;
     const Y = (K + 0.5) * CY;
-    for (let i = -K - 0.5; i <= K + 0.5; i++) {
-      for (const z of [0, -L]) {
+    for (let layer = 0; layer <= LAYERS_DEEP; layer++) {
+      const z = -layer * CZ;
+      for (let i = -K - 0.5; i <= K + 0.5; i++) {
         p.push(i * CX, -Y, z, i * CX, Y, z);
         p.push(-X, i * CY, z, X, i * CY, z);
       }
-      for (let j = -K - 0.5; j <= K + 0.5; j++) p.push(i * CX, j * CY, 0, i * CX, j * CY, -L);
+    }
+    for (let i = -K - 0.5; i <= K + 0.5; i++) {
+      for (let j = -K - 0.5; j <= K + 0.5; j++) {
+        p.push(i * CX, j * CY, 0, i * CX, j * CY, -L);
+        if (lineRand() < 0.08) {
+          const layer = Math.floor(lineRand() * LAYERS_DEEP);
+          glint.push(i * CX, j * CY, -layer * CZ, i * CX, j * CY, -(layer + 1) * CZ);
+        }
+      }
     }
   }
   const lineGeometry = keep(new THREE.BufferGeometry());
   lineGeometry.setAttribute("position", new THREE.Float32BufferAttribute(p, 3));
   const lineMaterial = keep(new THREE.LineBasicMaterial({ color: 0xfbfbfb, transparent: true, opacity: 0, depthWrite: false }));
   scene.add(new THREE.LineSegments(lineGeometry, lineMaterial));
+  const glintGeometry = keep(new THREE.BufferGeometry());
+  glintGeometry.setAttribute("position", new THREE.Float32BufferAttribute(glint, 3));
+  const glintMaterial = keep(new THREE.LineBasicMaterial({ color: 0xfbfbfb, transparent: true, opacity: 0, depthWrite: false }));
+  scene.add(new THREE.LineSegments(glintGeometry, glintMaterial));
 
   // One texture per word, drawn large so it stays sharp up close.
   const textures = new Map<string, { texture: THREE.Texture; aspect: number }>();
@@ -171,17 +192,22 @@ export async function createScene(canvas: HTMLCanvasElement, pin: HTMLElement, p
 
   // The field: words on the horizontal walls. You look down onto the top few at first.
   const big = Math.max(phraseSize * 0.5, Math.min(vw * 0.1, 60));
-  // Spaced like Santal's: a handful of words to a row, with room between them.
-  const rowStep = big * 2.9;
-  const colStep = big * 6.8;
+  // Spaced like Santal's: a handful of words to a row, with plenty of room between them.
+  const rowStep = big * 3.4;
+  const colStep = big * 8;
   // The words run well past the shafts on every side, so no corner of the screen goes bare
-  // while the camera rolls.
-  const X = Math.max((K + 0.5) * CX, vw * 4);
+  // while the camera rolls. A phone's screen is narrow, so it needs less.
+  const X = tall ? Math.max(vw * 2.5, vh * 1.6) : Math.max((K + 0.5) * CX, vw * 4);
+  // On a phone the walls are close together, so only every other one carries words; otherwise
+  // the camera passes right by them as it tips, and single words loom across the screen.
+  const wallStep = Math.max(1, Math.round((vh * 0.42) / CY));
   // The walls above the phrase's carry words too. They would sit between you and the phrase at
   // first, so they only come up once the camera has tipped and they fill the upper side of the view.
   for (let j = K; j >= -DEEP; j--) {
+    if ((LAYERS - j) % wallStep !== 0) continue;
     const y = (j + 0.5) * CY;
     const high = j > LAYERS;
+    if (high && tall) continue;
     let row = 0;
     for (let z = -L - vh * 1.4 + rowStep * 0.5; z < vh * 2.6; z += rowStep, row++) {
       for (let x = -X + (row % 2) * colStep * 0.5; x < X; x += colStep) {
@@ -193,7 +219,7 @@ export async function createScene(canvas: HTMLCanvasElement, pin: HTMLElement, p
         // before it looks straight down, so that view stays nearly empty, as on Santal.
         const group = high ? "above" : pz > 0 ? "ahead" : "field";
         add(group, pick(creed.big), false, big, new THREE.Vector3(px, y, pz), lying, brightness(), THREE.DoubleSide);
-        if (rand() < 0.25) {
+        if (rand() < 0.2) {
           const turn = lying.clone().multiply(spin(rand() < 0.5 ? 72 : 14));
           const at = new THREE.Vector3(px + colStep * 0.3, y, pz + rowStep * 0.35);
           add(group, pick(creed.small), true, big * 0.42, at, turn, 0.15 + rand() * 0.3, THREE.DoubleSide);
@@ -416,6 +442,7 @@ export async function createScene(canvas: HTMLCanvasElement, pin: HTMLElement, p
       m.opacity = fade * settle * (i === 0 ? 1 : mix(1, 0.45, grow));
     });
     lineMaterial.opacity = 0.17 * ease(span(v, START, START + 110)) * fade;
+    glintMaterial.opacity = 0.5 * ease(span(v, START + 60, START + 200)) * fade;
     // The floor shows once you look down the shafts, dark at first, and brightens as you fall.
     floorMaterial.opacity = ease(span(v, 780, 880)) * fade;
     floorMaterial.color.setScalar(mix(0.18, 1, ease(span(v, 880, END - 30))));

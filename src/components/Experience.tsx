@@ -14,25 +14,16 @@ import { onFrame } from "@/lib/ticker";
 
 const cards = projects.flatMap((p, i) => ringCards[p.slug].map((src) => ({ src, project: i, slug: p.slug })));
 const N = cards.length;
-// The projects, as Santal shows its works: a full-bleed wall of renders in three columns, three deep.
-// Read across, each row holds all three projects, and no column repeats one.
-const shots = (
+// The projects: one tall render for each, cropped from the middle of the picture.
+const panels = (
   [
-    ["shararat", "bar"],
-    ["maatik", "facade"],
+    ["maatik", "vessel"],
     ["light-of-bharat", "dining"],
-    ["maatik", "cafe"],
-    ["light-of-bharat", "chess"],
-    ["shararat", "mezzanine"],
-    ["light-of-bharat", "counter"],
     ["shararat", "booths"],
-    ["maatik", "swing"],
   ] as const
 ).map(([slug, name]) => ({ ...work[slug][name], slug, title: projects.find((p) => p.slug === slug)!.title }));
-const columns = [0, 1, 2].map((c) => shots.filter((_, i) => i % 3 === c));
-// How far each column starts below the others, in screens. The middle one leads, as on Santal.
-// After that each column slides at its own pace, set by its height so all three finish level.
-const lag = [0.55, 0.15, 0.36];
+// How far each panel starts below the others, in screens. The middle one leads, as on Santal.
+const lag = [0.45, 0.15, 0.32];
 
 const clamp = (n: number) => Math.min(1, Math.max(0, n));
 const ease = (n: number) => n * n * (3 - 2 * n);
@@ -50,7 +41,7 @@ export function Experience() {
   const frameBox = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const worksRef = useRef<HTMLElement>(null);
-  const colRefs = useRef<HTMLDivElement[]>([]);
+  const panelRefs = useRef<HTMLAnchorElement[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [ready, setReady] = useState(false);
@@ -82,7 +73,6 @@ export function Experience() {
     let reelH = 0;
     let worksTop = 0;
     let worksH = 0;
-    let colH: number[] = [];
     let rot = 0;
     let last = performance.now();
     let filmT = 0;
@@ -133,9 +123,12 @@ export function Experience() {
     };
 
     const top = (el: HTMLElement) => el.getBoundingClientRect().top + window.scrollY;
+    // Screen heights are read off the stage's pin, which is 100svh, the unit every section here is
+    // sized in. On a phone window.innerHeight changes as the browser's bars come and go.
+    const pinEl = stageEl.firstElementChild as HTMLElement;
     const measure = () => {
       vw = window.innerWidth;
-      vh = window.innerHeight;
+      vh = pinEl.clientHeight;
       W = vw < 760 ? vw * 1.7 : Math.min(vw, vh * 1.75);
       stageEl.style.setProperty("--cw", `${(W * 0.085).toFixed(1)}px`);
       stageEl.style.setProperty("--ch", `${(W * 0.16).toFixed(1)}px`);
@@ -145,7 +138,6 @@ export function Experience() {
       reelH = reelEl.offsetHeight;
       worksTop = top(worksEl);
       worksH = worksEl.offsetHeight;
-      colH = colRefs.current.map((c) => c.offsetHeight);
       canvas.width = Math.min(vw, 1600);
       canvas.height = Math.round((canvas.width * vh) / vw);
       drawn = -1;
@@ -213,19 +205,17 @@ export function Experience() {
         }
       }
 
-      // The projects rise from below, the middle column first, and the columns keep their own pace.
-      // Their title comes up at the top only once the section has, so it never slides across the film.
-      // The wall is three pictures deep, so it settles by the time its foot reaches the screen's.
-      // On a phone it is shorter than the screen and simply stays put.
+      // The projects rise from below, the middle one first, and settle level as the section fills
+      // the screen. Their title comes up at the top only once the section has, so it never slides
+      // across the film. On a phone they stand one above the other and simply scroll.
       if (y + vh > worksTop && y < worksTop + worksH) {
         worksEl.style.setProperty("--label", span(y, worksTop - vh * 0.2, worksTop).toFixed(3));
         const fixed = still || vw < 760;
         const settle = worksTop + Math.max(1, worksH - vh);
         const rise = fixed ? 1 : ease(span(y, worksTop - vh, settle));
-        const along = span(y, worksTop, settle);
-        colRefs.current.forEach((col, i) => {
-          const off = fixed ? 0 : lag[i] * vh * (1 - rise) + (Math.max(...colH) - colH[i]) * along;
-          col.style.transform = `translate3d(0, ${off.toFixed(2)}px, 0)`;
+        panelRefs.current.forEach((panel, i) => {
+          const off = fixed ? 0 : lag[i] * vh * (1 - rise);
+          panel.style.transform = off > 0.01 ? `translate3d(0, ${off.toFixed(2)}px, 0)` : "";
         });
       }
 
@@ -292,7 +282,7 @@ export function Experience() {
           </div>
 
           <div className="stage__work">
-            <h2 className="stage__title">Four rooms, so far.</h2>
+            <h2 className="stage__title">Three rooms, so far.</h2>
             <ul className="stage__names">
               {projects.map((p, i) => (
                 <li key={p.slug} data-on={i === front}>
@@ -331,24 +321,23 @@ export function Experience() {
         <h2 id="works-title" className="works__label">
           Selected projects
         </h2>
-        <div className="works__cols">
-          {columns.map((column, c) => (
-            <div
-              key={c}
-              className="works__col"
+        <div className="works__panels">
+          {panels.map((panel, i) => (
+            <Link
+              key={panel.slug}
+              href={`/work/${panel.slug}`}
+              className="shot"
+              aria-label={panel.title}
               ref={(n) => {
-                if (n) colRefs.current[c] = n;
+                if (n) panelRefs.current[i] = n;
               }}
             >
-              {column.map((shot) => (
-                <Link key={shot.src} href={`/work/${shot.slug}`} className="shot" aria-label={`${shot.title}, ${shot.alt}`}>
-                  <Image src={shot.src} alt={shot.alt} width={shot.width} height={shot.height} sizes="(max-width: 760px) 50vw, 33vw" />
-                  <span className="shot__name" aria-hidden>
-                    {shot.title}
-                  </span>
-                </Link>
-              ))}
-            </div>
+              {/* Cropped to a tall slice, a picture shows only its middle, so it needs to load about as wide as the panel is tall. */}
+              <Image src={panel.src} alt={panel.alt} fill sizes="(max-width: 760px) 120vw, 100vw" />
+              <span className="shot__name" aria-hidden>
+                {panel.title}
+              </span>
+            </Link>
           ))}
         </div>
       </section>

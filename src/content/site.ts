@@ -172,7 +172,7 @@ export const projects: Project[] = [
             ],
           },
         ],
-        images: ["site-map", "site-hall", "site-court", "site-stair"],
+        images: ["site-hall", "site-court", "site-stair"],
       },
       {
         kind: "story",
@@ -194,8 +194,6 @@ export const projects: Project[] = [
         kind: "columns",
         title: "Concept development",
         columns: [
-          { media: ["worktable"], body: ["The worktable takes its shape from क, the first letter of kumbhar, after Kumbharwada in Dharavi, where the potters work."] },
-          { media: ["meeting"], body: ["Where the management meets. A workspace shaped by curves, flow and fluidity."] },
           { media: ["concept-pottery"], body: ["A new, ergonomic potter’s table, for throwing on the wheel, drying and curing."] },
           { media: ["concept-cafe"], body: ["The café opens onto the workshop, so people can work over a cup of coffee."] },
         ],
@@ -212,6 +210,13 @@ export const projects: Project[] = [
               "Light matters most here. There is so much daylight that every detail settles into the earthy room.",
             ],
           },
+        ],
+      },
+      {
+        kind: "columns",
+        columns: [
+          { media: ["worktable"], body: ["The worktable takes its shape from क, the first letter of kumbhar, after Kumbharwada in Dharavi, where the potters work."] },
+          { media: ["meeting"], body: ["Where the management meets. A workspace shaped by curves, flow and fluidity."] },
         ],
       },
       {
@@ -400,7 +405,7 @@ export const projects: Project[] = [
       },
       {
         kind: "layout",
-        title: "Furniture layout",
+        title: "Ground and mezzanine",
         drawing: "plans-ground",
         body: [
           "Dark timber, burgundy leather, brushed brass, terrazzo, smoked glass, patterned carpets, tropical plants and warm amber light. Chunky 90s furniture, curved sofas, low lounge chairs, quirky lamps, and a little visual excess.",
@@ -417,7 +422,7 @@ export const projects: Project[] = [
       },
       {
         kind: "layout",
-        title: "First floor",
+        title: "First floor and mezzanine",
         drawing: "plans-first",
         body: [
           "Communal tables take the centre, with smaller clusters and lounges at the edges, moving from working together to quieter time alone.",

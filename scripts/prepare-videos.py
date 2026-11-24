@@ -51,8 +51,9 @@ def scrub(name: str, keep: list[tuple[float, float]], out: Path, count: int, wid
     print(name, "->", out.relative_to(ROOT), count, "frames")
 
 
-def loop(name: str, keep: list[tuple[float, float]], out: Path, speed: float, hold: float = 1.6, width: int = 1080):
-    """A muted loop at `speed` times, ending on the finished render for a moment."""
+def loop(name: str, keep: list[tuple[float, float]], out: Path, speed: float, hold: float = 1.6, width: int = 1080, flip: bool = False):
+    """A muted loop at `speed` times, ending on the finished render for a moment. `flip` turns a
+    recording made upside down the right way up."""
     out.parent.mkdir(parents=True, exist_ok=True)
     container = av.open(str(out), "w", options={"movflags": "+faststart"})
     stream = None
@@ -63,6 +64,8 @@ def loop(name: str, keep: list[tuple[float, float]], out: Path, speed: float, ho
             continue
         i -= every
         im = im.resize((width, round(im.height * width / im.width / 2) * 2), Image.LANCZOS)
+        if flip:
+            im = im.rotate(180)
         if stream is None:
             stream = container.add_stream("libx264", rate=30)
             stream.width, stream.height = im.size
@@ -86,8 +89,8 @@ def main():
     scrub("maatik-roof.mp4", [(1.4, 23.95), (24.1, 37.3), (47.1, 57.0)], PUBLIC / "process" / "maatik-roof", 181)
     # The worktable, drawn from क, the first letter of kumbhar.
     loop("maatik-worktable.mp4", [(1.4, 18.2), (20.7, 26.05)], PUBLIC / "work" / "maatik" / "worktable.mp4", speed=1.5)
-    # The management's meeting table, under its lamps.
-    loop("maatik-meeting.mp4", [(1.4, 97.9), (99.95, 106.6)], PUBLIC / "work" / "maatik" / "meeting.mp4", speed=4)
+    # The management's meeting table, under its lamps. He drew it upside down.
+    loop("maatik-meeting.mp4", [(1.4, 97.9), (99.95, 106.6)], PUBLIC / "work" / "maatik" / "meeting.mp4", speed=4, flip=True)
 
 
 if __name__ == "__main__":

@@ -17,9 +17,9 @@ const PRELOAD_RADIUS = 10;
 const MAX_DEVICE_PIXEL_RATIO = 1.5;
 const SMOOTHING_TIME_CONSTANT_MS = 32;
 const PROCESS_STAGES = [
-  "It begins with one line: the roof.",
-  "The roof finds its columns.",
-  "And the potters have a place of their own.",
+  "Every space begins with a single line.",
+  "The line becomes a structure.",
+  "And the structure becomes a place.",
 ] as const;
 const PLAN_START_FRAME = 62;
 const RENDER_START_FRAME = 141;
@@ -167,7 +167,7 @@ export function ProcessVideo() {
       <h2 className="process-video__title" id="process-video-title">
         How I design a space
       </h2>
-      <p className="process-video__note">The roof over the Maatik workshop, as I drew it.</p>
+      <p className="process-video__note">From the first line to the finished room, the way I draw every project.</p>
       <div className="process-video__timeline" ref={section}>
         <div className="process-video__sticky">
           <div className="process-video__frame">
@@ -179,7 +179,7 @@ export function ProcessVideo() {
             />
             <div
               className="process-video__stage-label"
-              aria-label="Design process: the roof, its columns, and the workshop"
+              aria-label="Design process: a line, a structure, a place"
             >
               {PROCESS_STAGES.map((stage, stageIndex) => (
                 <span

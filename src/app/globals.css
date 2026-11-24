@@ -9,7 +9,9 @@
   --lava: #f56e0f;
   --line: rgb(21 20 25 / 0.09);
 
-  --gutter: clamp(16px, 1.6vw, 24px);
+  /* The margin on both sides of every page, and the gap between columns. */
+  --gutter: clamp(20px, 4vw, 64px);
+  --gap: clamp(12px, 1.6vw, 24px);
   --header: 56px;
   --out: cubic-bezier(0.2, 0.7, 0.1, 1);
   --curtain: cubic-bezier(0.76, 0, 0.24, 1);
@@ -388,7 +390,7 @@ body:has(.loader) .header {
   display: flex;
   justify-content: center;
   gap: 0.2em;
-  font-size: min(21.6vw, 36svh);
+  font-size: min(17.5vw, 29svh);
   line-height: 0.86;
   letter-spacing: -0.025em;
   white-space: nowrap;
@@ -471,7 +473,7 @@ body:has(.loader) .header {
   inset: auto var(--gutter) 22px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--gutter);
+  gap: var(--gap);
   align-items: end;
   opacity: calc(1 - var(--open) * 2.4);
 }
@@ -533,7 +535,7 @@ body:has(.loader) .header {
 .stage__names a {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--gutter);
+  gap: var(--gap);
   align-items: baseline;
 }
 
@@ -617,7 +619,7 @@ body:has(.loader) .header {
 .creed__eyebrow {
   position: absolute;
   top: calc(var(--header) + 14svh);
-  left: calc(25% + var(--gutter) / 2);
+  left: calc(25% + var(--gap) / 2);
   font-size: 14px;
   max-width: 16ch;
   opacity: 0;
@@ -807,16 +809,16 @@ body:has(.loader) .header {
   transform: none;
 }
 
-/* Selected projects, as Santal shows its works: a wall of his pictures rises in three columns, the
-   middle one first, over the film's last screen as it dims into the dark. That first screen of the
-   section is clear, so the film shows through it. */
+/* Selected projects: one tall render for each, side by side, the height of the screen. They rise
+   over the film's last screen as it dims into the dark, the middle one first. That first screen of
+   the section is clear, so the film shows through it. */
 
 .works {
   --lead: 26svh;
   position: relative;
   z-index: 2;
   margin-top: -100svh;
-  padding: var(--lead) 6px 6px;
+  padding: var(--lead) var(--gutter) var(--gutter);
   background: linear-gradient(transparent 100svh, var(--void) 100svh);
   color: var(--snow);
 }
@@ -834,29 +836,23 @@ body:has(.loader) .header {
   color: rgb(251 251 251 / 0.7);
 }
 
-.works__cols {
+.works__panels {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  align-items: start;
-}
-
-.works__col {
-  display: grid;
-  gap: 6px;
-  will-change: transform;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--gap);
 }
 
 .shot {
   position: relative;
   display: block;
+  height: calc(100svh - var(--header) - var(--gutter));
   overflow: hidden;
   background: #1d1c21;
+  will-change: transform;
 }
 
 .shot img {
-  width: 100%;
-  height: auto;
+  object-fit: cover;
   transition: transform 1.4s var(--out);
 }
 
@@ -878,7 +874,7 @@ body:has(.loader) .header {
   place-items: center;
   padding: var(--gutter);
   font-family: var(--serif);
-  font-size: clamp(32px, 3.4vw, 60px);
+  font-size: clamp(36px, 4vw, 72px);
   line-height: 1;
   letter-spacing: -0.02em;
   text-align: center;
@@ -914,11 +910,10 @@ body:has(.loader) .header {
   }
 
   .shot__name {
-    inset: auto auto 10px 12px;
+    inset: auto auto 18px 20px;
     display: block;
     padding: 0;
-    font-family: var(--sans);
-    font-size: 14px;
+    font-size: 34px;
     color: var(--snow);
     text-shadow: 0 1px 12px rgb(0 0 0 / 0.5);
     opacity: 1;
@@ -1031,7 +1026,7 @@ body:has(.loader) .header {
 .about__body {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  gap: var(--gutter);
+  gap: var(--gap);
   margin-top: clamp(80px, 10vw, 170px);
   align-items: start;
 }
@@ -1086,7 +1081,7 @@ body:has(.loader) .header {
 .about__index > div {
   display: grid;
   grid-template-columns: 9.5em 1fr;
-  gap: var(--gutter);
+  gap: var(--gap);
   padding: 16px 0;
   border-top: 1px solid var(--line);
   font-size: 14px;
@@ -1370,8 +1365,112 @@ body:has(.loader) .header {
 /* Footer */
 
 .footer {
-  padding: clamp(160px, 20vw, 300px) var(--gutter) 24px;
+  padding: clamp(24px, 4vw, 64px) var(--gutter) 24px;
   text-align: center;
+}
+
+/* The end of the road: a lava line, the colour of the journey's rail, draws down the middle as
+   you arrive, ends in a last stop, and the title rises out of it. Scroll-driven in CSS, so it
+   costs nothing on a phone; without support it simply shows finished. */
+.footer__road {
+  position: relative;
+  height: clamp(180px, 34svh, 360px);
+  margin-bottom: clamp(28px, 3vw, 48px);
+}
+
+.footer__line {
+  position: absolute;
+  top: 0;
+  bottom: 9px;
+  left: 50%;
+  width: 1px;
+  background: var(--lava);
+  transform-origin: top;
+}
+
+.footer__stop {
+  position: absolute;
+  bottom: 0;
+  left: calc(50% - 4.5px);
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--lava);
+}
+
+.footer__word {
+  display: inline-block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  vertical-align: top;
+}
+
+.footer__word > span {
+  display: inline-block;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .footer__road {
+      view-timeline: --road block;
+    }
+
+    .footer__line {
+      animation: road-draw linear both;
+      animation-timeline: --road;
+      animation-range: entry 0% contain 20%;
+    }
+
+    .footer__stop {
+      animation: road-stop linear both;
+      animation-timeline: --road;
+      animation-range: contain 16% contain 28%;
+    }
+
+    .footer {
+      timeline-scope: --road;
+    }
+
+    .footer__word > span {
+      animation: road-rise linear both;
+      animation-timeline: --road;
+      animation-range: contain 22% contain 46%;
+    }
+
+    .footer__word + .footer__word > span {
+      animation-range: contain 27% contain 51%;
+    }
+  }
+}
+
+@keyframes road-draw {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes road-stop {
+  from {
+    transform: scale(0);
+  }
+  60% {
+    transform: scale(1.6);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes road-rise {
+  from {
+    transform: translateY(105%);
+  }
+  to {
+    transform: none;
+  }
 }
 
 .footer__title {
@@ -1471,7 +1570,7 @@ body:has(.loader) .header {
   padding-inline: var(--gutter);
   display: grid;
   grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  gap: var(--gutter);
+  gap: var(--gap);
   align-items: center;
 }
 
@@ -1527,18 +1626,14 @@ h3.chapter__title {
   font-size: clamp(26px, 2.2vw, 36px);
 }
 
-.words,
-.columns__item,
-.views__words {
+.words {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   align-content: start;
   gap: 14px;
 }
 
-.words p,
-.columns__item p,
-.views__words p {
+.words p {
   max-width: 42ch;
   text-wrap: pretty;
 }
@@ -1564,100 +1659,76 @@ h3.chapter__title {
   color: var(--dusty);
 }
 
-/* His drawings and sketches are on white paper; on the page they lose the paper. A drawing is
-   never taller than the screen, so a whole plan or elevation reads at once. */
+/* His drawings and sketches are on white paper; on the page they lose the paper. */
 .figure--drawing img,
 .figure--sketch img {
   mix-blend-mode: multiply;
 }
 
-.figure--drawing img {
-  max-height: 86svh;
+/* Equal columns. Pictures in them share one frame, and words in them start at the pictures'
+   left edges. Drawings and sketches sit whole in their frames, on the left. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--count, 3), minmax(0, 1fr));
+  gap: var(--gap);
+  align-items: start;
+}
+
+.grid--words {
+  row-gap: 32px;
+}
+
+.grid:not(.grid--words) + .grid--words {
+  margin-top: calc(var(--gap) - clamp(32px, 4vw, 56px));
+}
+
+.grid--words p {
+  max-width: 42ch;
+  text-wrap: pretty;
+}
+
+.grid .figure img,
+.grid .figure video {
+  aspect-ratio: var(--ratio);
+  object-fit: cover;
+}
+
+.grid[data-whole="true"] .figure img {
   object-fit: contain;
-  object-position: left center;
+  object-position: left bottom;
 }
 
-.row {
-  display: flex;
-  gap: var(--gutter);
-  align-items: flex-start;
+/* A technical drawing sits in the middle of the page, whole, and never taller than the screen,
+   so a plan or a section reads at once. */
+.drawing .figure {
+  display: grid;
+  justify-items: center;
 }
 
-.row > div {
-  flex-basis: 0;
-  min-width: 0;
+.drawing img {
+  width: auto;
+  max-width: 100%;
+  max-height: 86svh;
+}
+
+.drawing figcaption {
+  text-align: center;
 }
 
 .story__words {
   display: grid;
-  grid-template-columns: repeat(var(--count, 3), minmax(0, 1fr));
-  gap: 40px var(--gutter);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 40px var(--gap);
 }
 
-.story__words[data-count="1"] {
-  --count: 2;
-}
-
-.story__words[data-count="2"] {
-  --count: 2;
-  width: min(100%, 1000px);
-}
-
-.story__words[data-count="4"] {
-  --count: 2;
-}
-
-.story[data-tall="true"] {
+.story[data-tall] {
   grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  gap: var(--gutter);
+  gap: var(--gap);
   align-items: center;
 }
 
-.story[data-tall="true"] .figure figcaption {
+.story[data-tall] .figure figcaption {
   display: none;
-}
-
-.columns {
-  display: grid;
-  grid-template-columns: repeat(var(--count, 3), minmax(0, 1fr));
-  gap: 48px var(--gutter);
-  align-items: start;
-}
-
-.columns[data-count="2"] {
-  --count: 2;
-}
-
-.columns[data-count="4"] {
-  --count: 2;
-}
-
-.columns__item .figure {
-  margin-bottom: 10px;
-}
-
-.figure--sketch img {
-  max-height: 58svh;
-  object-fit: contain;
-  object-position: left center;
-}
-
-.layout {
-  grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
-  align-items: center;
-}
-
-.views__words {
-  grid-template-columns: repeat(2, minmax(0, 42ch));
-  column-gap: var(--gutter);
-}
-
-.views__words .chapter__title {
-  grid-column: 1 / -1;
-}
-
-.views .figure--drawing {
-  width: min(100%, 1500px);
 }
 
 .facts {
@@ -1670,7 +1741,7 @@ h3.chapter__title {
 .facts div {
   display: grid;
   grid-template-columns: 9em 1fr;
-  gap: var(--gutter);
+  gap: var(--gap);
 }
 
 .facts dt {
@@ -1799,7 +1870,7 @@ h3.chapter__title {
   }
 
   .stage__name {
-    font-size: 20.5vw;
+    font-size: 17.5vw;
     inset-block-start: calc(var(--header) + 2svh);
   }
 
@@ -1821,15 +1892,18 @@ h3.chapter__title {
     grid-column: 1;
   }
 
-  .works,
-  .works__cols,
-  .works__col {
-    gap: 4px;
+  /* On a phone the three stand one above the other, each most of a screen tall. They start
+     lower, so the first arrives once the film has dimmed into the dark, not over it. */
+  .works {
+    --lead: 58svh;
   }
 
-  /* The phone's wall is shorter than the screen, so it starts lower to still cover the film's last screen. */
-  .works {
-    --lead: 62svh;
+  .works__panels {
+    grid-template-columns: 1fr;
+  }
+
+  .shot {
+    height: 78svh;
   }
 
   .process-video__frame {
@@ -1937,10 +2011,9 @@ h3.chapter__title {
   }
 
   .opening,
-  .story[data-tall="true"],
-  .layout,
+  .story[data-tall],
   .story__words,
-  .views__words {
+  .grid {
     grid-template-columns: 1fr;
   }
 
@@ -1949,24 +2022,40 @@ h3.chapter__title {
     max-height: 48svh;
   }
 
-  .row {
+  /* One column on a phone: each picture is followed by its own title and words, not all the
+     pictures and then all the words. */
+  .chapter[data-pair] {
+    display: flex;
     flex-direction: column;
+    gap: 14px;
   }
 
-  .row > div {
-    flex-basis: auto;
+  .chapter[data-pair] > .grid {
+    display: contents;
   }
 
-  .columns,
-  .columns[data-count="2"] {
-    --count: 1;
+  .chapter[data-pair] > .grid > * {
+    order: calc(var(--i) * 3 + var(--k));
   }
 
-  .columns[data-count="4"] {
-    --count: 1;
+  .chapter[data-pair] > .grid--words > * {
+    margin-bottom: 36px;
   }
 
-  .figure--drawing img {
+  .chapter[data-pair] > .grid--lead > * {
+    margin-bottom: 0;
+  }
+
+  .chapter[data-pair] > .chapter__title {
+    order: -1;
+    margin-bottom: 18px;
+  }
+
+  .chapter[data-pair] > .drawing {
+    order: 999;
+  }
+
+  .drawing img {
     max-height: 70svh;
   }
 }

@@ -63,18 +63,28 @@ function CreedSection() {
 
     // How wide the landing's ring is when it lies flat, as a share of the hairline's length.
     let ring = 1;
+    // Measured on the pin, which is 100svh: on a phone the browser's bars come and go as you
+    // scroll, and window.innerHeight changes with them while the section does not.
     const measure = () => {
-      vh = window.innerHeight;
-      const vw = window.innerWidth;
+      vh = pinEl.clientHeight;
+      const vw = pinEl.clientWidth;
       const W = vw < 760 ? vw * 1.7 : Math.min(vw, vh * 1.75);
       ring = (2 * Math.min(W * 0.3, vw * 0.44) + W * 0.085) / (2.4 * Math.max(vw, vh));
       start = el.getBoundingClientRect().top + window.scrollY;
       shown = -1;
     };
 
-    // The scene is built for one screen size, so a resize builds it again.
+    // The scene is built for one screen size, so a real resize builds it again. The bars of a
+    // phone's browser showing and hiding is not one.
+    let builtW = pinEl.clientWidth;
+    let builtH = pinEl.clientHeight;
     const resize = () => {
       measure();
+      const w = pinEl.clientWidth;
+      const h = pinEl.clientHeight;
+      if (w === builtW && Math.abs(h - builtH) < 80) return;
+      builtW = w;
+      builtH = h;
       clearTimeout(rebuild);
       rebuild = window.setTimeout(() => {
         scene?.dispose();
